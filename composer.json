@@ -1,0 +1,30 @@
+{
+    "name": "teltek/pmk2-geant-webtv-bundle",
+    "type": "symfony-bundle",
+    "description": "GEANT WebTVBundle.",
+    "keywords": [
+        "theming",
+        "symfony2",
+        "bundle",
+        "pumukit",
+        "teltek"
+    ],
+    "homepage": "https://gitlab.teltek.es/pumukit2/pumukitgeantwebtvbundle",
+    "license": "Copyright",
+    "authors": [
+        {
+            "name": "Teltek Team",
+            "homepage": "http://teltek.es"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/framework-bundle": "~2.0",
+        "twig/twig": "~1.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Pumukit\\Geant\\WebTVBundle\\": ""
+        }
+    }
+}
