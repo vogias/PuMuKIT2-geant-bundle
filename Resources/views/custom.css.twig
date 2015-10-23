@@ -1,0 +1,24 @@
+{% extends 'PumukitWebTVBundle::default.css.twig' %}
+
+{% block body %}
+
+{# HERE you can set your variables to be overrided #}
+{# Examples: #}
+{% set content_max_width = "1200px" %}
+{% set font_base_color = "#131" %}
+{% set header_background = '#b7b6b6 url(' ~asset('bundles/pumukitgeantwebtv/images/header_bg_side.png')~'); background-size: contain;' %}
+{{ parent() }}
+.header-content{
+padding-top:10px;
+}
+footer{
+max-width: {{content_max_width}};
+margin: 0 auto;
+background: #fff;
+padding: 20px 15px;
+}
+.row.footer_row{
+
+}
+{# Add your own CSS rules #}
+{% endblock %}
