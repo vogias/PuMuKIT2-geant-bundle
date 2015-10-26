@@ -5,8 +5,11 @@
 {# HERE you can set your variables to be overrided #}
 {# Examples: #}
 {% set content_max_width = "1200px" %}
-{% set font_base_color = "#131" %}
+{% set default_content_font = "#004361" %}
+{% set default_light_font = "#004361" %}
+{#{% set default_light_background = "" %}#}
 {% set header_background = '#b7b6b6 url(' ~asset('bundles/pumukitgeantwebtv/images/header_bg_side.png')~'); background-size: contain;' %}
+{% set big_breadcrumbs = true %}
 {{ parent() }}
 .header-content{
 padding-top:10px;
