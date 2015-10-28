@@ -1,0 +1,29 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Product",
+    "description": "A Geant Feed Object",
+    "type": "object",
+    "properties": {
+        "identifier": {
+            "description": "The unique identifier for a Geant Feed Object. It is used to sync the PuMuKIT Multimedia Object.",
+            "type": "string"
+        },
+        "set": {
+            "description": "The provider of the Geant Feed Object. The PuMuKIT Multimedia Object will be tagged with this provider.",
+            "type": "string"
+        },
+        "status": {
+            "description": "The status of the Geant Feed Object (published, hidden, blocked). Error if not equal to 'published'.",
+            "type": "string"
+        },
+        "creationDate": {
+            "description": "The date set for the Geant Feed Object. Must follow the ISO 8601 standard to be parsed correctly (YYYY-MM-DD).",
+            "type": "string"
+        },
+        "languageBlocks": {
+            "type": "array",
+            "items":
+        }
+    },
+    "required": ["identifier", "set", "status", "creationDate"]
+}
