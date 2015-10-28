@@ -24,7 +24,7 @@ class FeedProcesserService
         $processedObject = array();
         $processedObject['lastSyncDate'] = new \DateTime();
         $processedObject['provider'] = $geantFeedObject['set'];
-        $processedObject['feed_id'] = $geantFeedObject['identifier'];
+        $processedObject['identifier'] = $geantFeedObject['identifier'];
         $processedObject['status'] = $geantFeedObject['status'];
         $lang = $this->retrieveLanguage($geantFeedObject);
         $processedObject['language'] = $lang;
@@ -141,7 +141,8 @@ class FeedProcesserService
                 if(!isset($contributor['name'])) {
                     continue;
                 }
-                $people = $contributor;
+                $people['name'] = $contributor['name'];
+                $people['role'] = isset($contributor['role']) ? mb_strtolower($contributor['role']) : '';
             }
         }
         return $people;
