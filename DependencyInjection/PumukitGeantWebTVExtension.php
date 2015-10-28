@@ -19,8 +19,8 @@ class PumukitGeantWebTVExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        /*$loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-        $loader->load('services.xml');*/
+        $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader->load('services.xml');
         $loader2 = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader2->load('parameters.yml');
     }

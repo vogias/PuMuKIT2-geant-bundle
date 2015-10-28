@@ -4,13 +4,24 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
-    <!--
+    <parameters>
+        <parameter key="geant.feedsyncservice.baseurl">http://terenaoer.grnet.gr/agro-search-1.0-SNAPSHOT/v1/akif/</parameter>
+    </parameters>
+
     <services>
-        <service id="pumukit_geant_web_tv.example" class="Pumukit\Geant\WebTVBundle\Example">
-            <argument type="service" id="service_id" />
-            <argument>plain_value</argument>
-            <argument>%parameter_name%</argument>
+        <service id="pumukit_web_tv.geant.feedsyncclient" class="Pumukit\Geant\WebTVBundle\Services\FeedSyncClientService">
+          <argument>%geant.feedsyncservice.baseurl%</argument>
         </service>
+
+        <service id="pumukit_web_tv.geant.feedprocesser" class="Pumukit\Geant\WebTVBundle\Services\FeedProcesserService">
+        </service>
+
+        <service id="pumukit_web_tv.geant.feedsync" class="Pumukit\Geant\WebTVBundle\Services\FeedSyncService">
+          <argument type="service" id="router" />
+          <argument type="service" id="session" />
+          <argument type="service" id="pumukit_web_tv.geant.feedsyncclient" />
+          <argument type="service" id="pumukit_web_tv.geant.feedprocesser" />
+        </service>
+
     </services>
-    -->
 </container>
