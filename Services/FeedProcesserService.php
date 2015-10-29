@@ -22,6 +22,9 @@ class FeedProcesserService
     public function process( $geantFeedObject )
     {
         $processedObject = array();
+        if(empty($geantFeedObject['expressions'])) {
+            throw new \Exception(sprintf('ERROR: The Geant Feed with ID: %s  does not have a playable resource.',$geantFeedObject['identifier']));
+        }
         $processedObject['lastSyncDate'] = new \DateTime();
         $processedObject['provider'] = $geantFeedObject['set'];
         $processedObject['identifier'] = $geantFeedObject['identifier'];
@@ -36,9 +39,21 @@ class FeedProcesserService
         $processedObject['copyright'] = $this->retrieveCopyright($geantFeedObject, $lang);
         $processedObject['license'] = $this->retrieveCopyright($geantFeedObject, $lang);
         $processedObject['track_url'] = $geantFeedObject['expressions']['manifestations']['items']['url'];
-        $processedObject['track_format'] = $geantFeedObject['expressions']['manifestations']['format'];
-        $processedObject['track_thumbnail'] = $geantFeedObject['expressions']['manifestations']['thumbnail'];
-        $processedObject['track_duration'] = $geantFeedObject['expressions']['manifestations']['duration'];
+        if(isset($geantFeedObject['expressions']['manifestations']['format'])) {
+            $format = $geantFeedObject['expressions']['manifestations']['format']; //NOTE This field should be mandatory (FCCN DOESN'T HAVE IT)
+        }
+        else {
+            $format = '';
+        }
+        $processedObject['track_format'] = $format;
+        if(isset($geantFeedObject['expressions']['manifestations']['duration'])) {
+            $duration = $geantFeedObject['expressions']['manifestations']['duration']; //NOTE This field should be mandatory (CAMPUSDOMAR DOESN'T HAVE IT)
+        }
+        else {
+            $duration = '00:00';
+        }
+        $processedObject['track_duration'] = $duration;
+        $processedObject['thumbnail'] = $geantFeedObject['expressions']['manifestations']['thumbnail'];
         $processedObject['tags'] = $this->retrieveTagCodes($geantFeedObject);
         $processedObject['people'] = $this->retrievePeople($geantFeedObject);
         return $processedObject;
@@ -100,12 +115,15 @@ class FeedProcesserService
         else if(isset($geantFeedObject['rights']['description'][$lang])){
             $copyright = $geantFeedObject['rights']['description'][$lang];
         }
-        else {
+        else if(isset($geantFeedObject['rights']['description'])) {
             foreach($geantFeedObject['rights']['description'] as $rights) {
                 if(isset($rights)){
                     $copyright = $rights;
                 }
             }
+        }
+        else {
+            $copyright = 'NO COPYRIGHT ADDED.'; //Copyright is MANDATORY! (Prace does not have it)
         }
         return $copyright;
     }
@@ -125,7 +143,9 @@ class FeedProcesserService
     {
         $tags = array();
         if(isset($geantFeedObject['tokenBlock']['taxonPaths'])){
-            $tags = $geantFeedObject['tokenBlock']['taxonPaths'];
+            foreach($geantFeedObject['tokenBlock']['taxonPaths'] as $key=>$tag) {
+                $tags[] = $key;
+            }
         }
     return $tags;
     }
@@ -137,12 +157,13 @@ class FeedProcesserService
     {
         $people = array();
         if(isset($geantFeedObject['contributors'])) {
-            foreach($geantFeedObject['contributors'] as $contributor) {
+            foreach($geantFeedObject['contributors'] as $id=>$contributor) {
                 if(!isset($contributor['name'])) {
                     continue;
                 }
-                $people['name'] = $contributor['name'];
-                $people['role'] = isset($contributor['role']) ? mb_strtolower($contributor['role']) : '';
+                $people[$id] = array();
+                $people[$id]['name'] = $contributor['name'];
+                $people[$id]['role'] = isset($contributor['role']) ? mb_strtolower($contributor['role']) : '';
             }
         }
         return $people;
@@ -157,30 +178,30 @@ class FeedProcesserService
     public function mapCodeToItunes($code)
     {
         $code = substr($code,0,3);
-        $mapTable = array('U11' => array(108101),
-                          'U12' => array(108000),
-                          'U21' => array(109101),
-                          'U22' => array(109108),
-                          'U23' => array(109104),
-                          'U24' => array(109103),
-                          'U25' => array(109102,109107),
-                          'U31' => array(109100),
-                          'U32' => array(103000),
-                          'U33' => array(101000),
-                          'U51' => array(105000),
-                          'U53' => array(100100),
-                          'U54' => array(109106),
-                          'U55' => array(104000),
-                          'U56' => array(111000),
-                          'U57' => array(106109),
-                          'U58' => array(112000),
-                          'U59' => array(110101),
-                          'U61' => array(110103),
-                          'U62' => array(102000),
-                          'U63' => array(110105),
-                          'U71' => array(105102),
-                          'U72' => array(105101),
-                          'U92' => array(111000)
+        $mapTable = array('U11' => array('108101'),
+                          'U12' => array('108000'),
+                          'U21' => array('109101'),
+                          'U22' => array('109108'),
+                          'U23' => array('109104'),
+                          'U24' => array('109103'),
+                          'U25' => array('109102','109107'),
+                          'U31' => array('109100'),
+                          'U32' => array('103000'),
+                          'U33' => array('101000'),
+                          'U51' => array('105000'),
+                          'U53' => array('100100'),
+                          'U54' => array('109106'),
+                          'U55' => array('104000'),
+                          'U56' => array('111000'),
+                          'U57' => array('106109'),
+                          'U58' => array('112000'),
+                          'U59' => array('110101'),
+                          'U61' => array('110103'),
+                          'U62' => array('102000'),
+                          'U63' => array('110105'),
+                          'U71' => array('105102'),
+                          'U72' => array('105101'),
+                          'U92' => array('111000')
         );
         if(isset($mapTable[$code])) {
             $mappedCode = $mapTable[$code];
