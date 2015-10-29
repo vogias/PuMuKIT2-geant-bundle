@@ -33,8 +33,6 @@ class FeedSyncClientService
         $time_started = microtime(true);
         $i = 1;
         $page = 1;
-        if($limit === null)
-        $limit = &$total;
         do {
             //Gets page (Exception thrown if error)
             $out = $this->getFeedPage($page);
@@ -48,7 +46,7 @@ class FeedSyncClientService
             }
             $page++;
             $this->showProgressEstimateDuration ($time_started, $i, $total);
-        } while($i <= $limit);
+        } while($i <= $limit && $i <= $total);
     }
 
     /**
@@ -58,7 +56,7 @@ class FeedSyncClientService
     protected function getFeedPage($page){
         $url = sprintf("%s%s%s", $this->feedUrl, '?q=*&',  http_build_query(array('page' => $page), '', '&'));
         //SOLO UPV
-        //$url = sprintf("%s%s%s", $this->solrUrl, '?set=UPV&',  http_build_query(array('page' => $page), '', '&'));
+        //$url = sprintf("%s%s%s", $this->feedUrl, '?set=UPV&',  http_build_query(array('page' => $page), '', '&'));
         $ch = curl_init($url);
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -80,6 +78,7 @@ class FeedSyncClientService
     * Prints on screen an estimated duration of the script and statistics about its execution.
     *
     */
+    //TODO USE Symfony Progress Bar: http://symfony.com/doc/current/components/console/helpers/progressbar.html
     protected function showProgressEstimateDuration($time_started, $processed, $total)
     {
         $now         = microtime(true);
