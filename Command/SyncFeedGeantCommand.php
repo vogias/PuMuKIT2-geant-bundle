@@ -49,7 +49,7 @@ EOT;
     protected function getCommandASCIIHeader()
     {
         return <<<EOT
-                _____
+              _____
                /  ___|
                \ `--. _   _ _ __   ___
                 `--. | | | | '_ \ / __|
