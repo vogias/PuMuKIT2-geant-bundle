@@ -25,7 +25,7 @@ class SyncFeedGeantCommand extends ContainerAwareCommand
         $output->writeln($formattedBlock);
         //EXECUTE SERVICE
         $feedSyncService = $this->getContainer()->get('pumukit_web_tv.geant.feedsync');
-        $feedSyncService->sync(1);
+        $feedSyncService->sync(100);
         //SHUTDOWN HAPPILY
     }
 
@@ -49,15 +49,17 @@ EOT;
     protected function getCommandASCIIHeader()
     {
         return <<<EOT
-              _____
-               /  ___|
-               \ `--. _   _ _ __   ___
-                `--. | | | | '_ \ / __|
-               /\__/ | |_| | | | | (__
-               \____/ \__, |_| |_|\___|
-                       __/ |
-                      |___/
 
+                        _
+                       | |
+  __ _  ___  __ _ _ __ | |_   ___ _   _ _ __   ___
+ / _` |/ _ \/ _` | '_ \| __| / __| | | | '_ \ / __|
+| (_| |  __/ (_| | | | | |_  \__ \ |_| | | | | (__
+ \__, |\___|\__,_|_| |_|\__| |___/\__, |_| |_|\___|
+    / |                            __/ |
+ |___/                            |___/
+
+:::Command to Sync the PuMuKIT Database with the Geant Project Feed:::
 EOT;
     }
 }
