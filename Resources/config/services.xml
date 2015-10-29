@@ -24,7 +24,10 @@
             <argument type="service" id="pumukit_web_tv.geant.feedsyncclient" />
             <argument type="service" id="pumukit_web_tv.geant.feedprocesser" />
             <argument type="service" id="doctrine_mongodb.odm.document_manager"/>
+        </service>
 
+        <service id="pumukitschema.announce" class="Pumukit\Geant\WebTVBundle\Services\AnnounceService">
+            <argument type="service" id="doctrine_mongodb.odm.document_manager"/>
         </service>
 
     </services>
