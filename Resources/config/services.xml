@@ -6,6 +6,10 @@
 
     <parameters>
         <parameter key="geant.feedsyncservice.baseurl">http://terenaoer.grnet.gr/agro-search-1.0-SNAPSHOT/v1/akif/</parameter>
+        <parameter key="pumukit_geant_webtv.breadcrumbs_parentweb" type="collection">
+            <parameter key="title">GÉANT Association</parameter>
+            <parameter key="url">http://www.geant.org/Pages/Home.aspx</parameter>
+        </parameter>
     </parameters>
 
     <services>
@@ -28,6 +32,16 @@
 
         <service id="pumukitschema.announce" class="Pumukit\Geant\WebTVBundle\Services\AnnounceService">
             <argument type="service" id="doctrine_mongodb.odm.document_manager"/>
+        </service>
+
+        <service id="pumukit_web_tv.breadcrumbs" class="Pumukit\WebTVBundle\Services\BreadcrumbsService">
+          <argument type="service" id="router" />
+          <argument type="service" id="session" />
+          <argument type="service" id="translator" />
+          <argument>%pumukit_web_tv.breadcrumbs_all_title%</argument>
+          <argument>%pumukit_web_tv.breadcrumbs_all_route%</argument>
+          <argument>%pumukit_web_tv.breadcrumbs_home_title%</argument>
+          <argument>%pumukit_geant_webtv.breadcrumbs_parentweb%</argument>
         </service>
 
     </services>
