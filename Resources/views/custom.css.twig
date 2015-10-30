@@ -15,6 +15,23 @@
 {% set mmobj_selected_background = '#E9E9E9' %}
 {{ parent() }}
 {# Add your own CSS rules #}
+.number-videos.serial {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    font-size: 0.8em;
+    width: 4.75em;
+    height: 1.25em;
+    z-index:10;
+    background: black;
+    color: white;
+    text-align: center;
+    overflow: hidden;
+    opacity: 0.50;
+}
+.pumukit_album .thumbnailholder {
+background: #f3f3f3;
+}
 .info .title {
     color: {{default_light_font}};
     cursor: pointer;
