@@ -4,39 +4,107 @@
 
 {# HERE you can set your variables to be overrided #}
 {# Examples: #}
-{% set content_max_width = "1200px" %}
+{% set content_max_width = "1350px" %}
 {% set default_content_font = "#004361" %}
-{% set default_light_font = "#004361" %}
+{% set default_light_font = "#ed1556" %}
 {#{% set default_light_background = "" %}#}
 {% set header_background = '#b7b6b6 url(' ~asset('bundles/pumukitgeantwebtv/images/header_bg_side.png')~'); background-size: contain;' %}
 {% set big_breadcrumbs = true %}
+{% set breadcrumbs_separator = " " %}
+{% set page_background = 'white' %}
+{% set mmobj_selected_background = '#E9E9E9' %}
 {{ parent() }}
+{# Add your own CSS rules #}
+.info .title {
+    color: {{default_light_font}};
+    cursor: pointer;
+}
+
+.info .title:hover {
+    color: grey;
+    border-bottom: 1px dotted grey;
+}
+.main_menu_text {
+    color: {{default_content_font}};
+    font-size: 16px;
+}
+body {
+    font-family: Swiss721BT-Light, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: lighter;
+}
+h1 {
+font-size: 36px;
+}
 .header-content{
-padding-top:10px;
+    padding-top:10px;
 }
 footer{
-max-width: {{content_max_width}};
-margin: 0 auto;
-background: #fff;
-padding: 20px 15px;
+    max-width: {{content_max_width}};
+    margin: 0 auto;
+    background: #fff;
+    padding: 20px 15px;
 }
-.row.footer_row{
 
-}
 .play_icon {
-margin: 5px;
-margin-left: 8px;
-background-image: url("{{asset('bundles/pumukitgeantwebtv/images/play_icon.png')}}");
-width: 18px;
-height: 13px;
+    margin: 5px;
+    margin-left: 8px;
+    background-image: url("{{asset('bundles/pumukitgeantwebtv/images/play_icon.png')}}");
+    width: 18px;
+    height: 13px;
 }
 .play_icon.small {
-width: 18px;
-height: 13px;
+    width: 18px;
+    height: 13px;
 }
 .index_widget {
-margin-top: 50px;
-margin-bottom: 50px;
+    margin-top: 50px;
+    margin-bottom: 50px;
 }
-{# Add your own CSS rules #}
+.breadcrumb li {
+    background-image: url("{{asset('bundles/pumukitgeantwebtv/images/crumbs_arrow.png')}}");
+    background-repeat: no-repeat;
+    background-position: right 0;
+    padding-right: 10px;
+}
+.breadcrumb li:last-of-type {
+    background-image: none;
+    font-size: 3.8em;
+}
+
+.widget.slidebar a{
+    font-weight: normal;
+    font-size: 1em;
+    border-bottom: 1px dotted grey;
+    padding-left: 5px;
+}
+.widget.slidebar a:hover, .widget.slidebar a.selected{
+    background: #e9e9e9;
+    color: #000;
+    margin-left: 0px;
+    padding-left: 5px;
+    z-index: 10;
+    transition: background 0.3s ease;
+}
+.widget.slidebar a.selected {
+    font-weight: bold;
+    background: none;
+    color: {{default_light_font}};
+}
+.widget.slidebar::before {
+    content: "Menu";
+    font-size: 1.25em;
+    font-weight: bold;
+    color: #004361;
+    line-height: 24px;
+    border-bottom: 0;
+    margin-bottom: 10px;
+    padding-left: 5px;
+}
+.menu.navbar {
+    margin-top: 10px;
+    padding-right: 30px;
+}
+.pumukit_mmobj {
+border-radius: 0;
+}
 {% endblock %}
