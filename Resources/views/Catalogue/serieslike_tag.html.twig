@@ -1,0 +1,22 @@
+{% set col_mapper = {'1': 'col-md-12', '2': 'col-md-6', '3': 'col-md-4', '4': 'col-md-3'} %}
+{% set col_class = ( col_mapper[cols|default('1')] | default(col_mapper['1'] ) ) %}
+<div class="{{ col_class }}">
+    <a href="{{ path('pumukit_webtv_bytag_multimediaobjects', {'cod': tag.cod}) }}">
+        <div class="pumukit_mmobj">
+            <figure class="pumukit_album">
+              <div class="thumbnail thumbnailo"><div class="thumbnailholder" ></div><img class="thumbnailimg" src="{{asset('bundles/pumukitgeantwebtv/images/sin_foto_serial.png') }} " /></div>
+              <div class="thumbnail thumbnailo"><div class="thumbnailholder" ></div><img class="thumbnailimg" src="" /></div>
+              <div class="thumbnail thumbnailo"><div class="thumbnailholder" ></div><img class="thumbnailimg" src="" /></div>
+            </figure>
+            <div class="info serial">
+              <div class="title">
+                {{tag.title | default('No title')|trans}}
+              </div>
+
+            </div>
+            <span class="number-videos serial">
+              {{tag.numberMultimediaObjects}} {{tag.numberMultimediaObjects>1?'videos':'video'}}
+            </span>
+        </div>
+    </a>
+</div>
