@@ -3,11 +3,16 @@
 <div class="{{ col_class }}">
 <!--    <a href="{{ path('pumukit_webtv_bytag_multimediaobjects', {'cod': tag.cod}) }}">-->
     <div class="pumukit_mmobj">
-        <figure class="pumukit_album">
-            <div class="thumbnail thumbnailo"><div class="thumbnailholder" ></div><img class="thumbnailimg" src="{{asset('bundles/pumukitgeantwebtv/images/sin_foto_serial.png') }} " /></div>
-            <div class="thumbnail thumbnailo"><div class="thumbnailholder" ></div><img class="thumbnailimg" src="" /></div>
-            <div class="thumbnail thumbnailo"><div class="thumbnailholder" ></div><img class="thumbnailimg" src="" /></div>
-        </figure>
+        <a href="{{ path('pumukit_webtv_bytag_multimediaobjects', {'cod': tag.cod}) }}">
+            <figure class="pumukit_album">
+                <div class="thumbnail thumbnailo"><div class="thumbnailholder" ></div><img class="thumbnailimg" src="{{asset('bundles/pumukitgeantwebtv/images/sin_foto_serial.png') }} " /></div>
+                <div class="thumbnail thumbnailo"><div class="thumbnailholder" ></div><img class="thumbnailimg" src="" /></div>
+                <div class="thumbnail thumbnailo"><div class="thumbnailholder" ></div><img class="thumbnailimg" src="" /></div>
+                <span class="number-videos serial"><p>
+                    {{tag.numberMultimediaObjects}} {{tag.numberMultimediaObjects>1?'videos':'video'}}</p>
+                </span>
+            </figure>
+        </a>
         <div class="info serial">
             <div class="title tagcatalogue">
                 <a href="{{ path('pumukit_webtv_bytag_multimediaobjects', {'cod': tag.cod}) }}">
@@ -18,8 +23,6 @@
                 </a>
             </div>
         </div>
-        <span class="number-videos serial"><p>
-            {{tag.numberMultimediaObjects}} {{tag.numberMultimediaObjects>1?'videos':'video'}}</p>
-        </span>
-    </div></a>
+    </div>
+    <!--</a>-->
 </div>

@@ -7,6 +7,8 @@
 {% set content_max_width = "1350px" %}
 {% set default_content_font = "#004361" %}
 {% set default_light_font = "#ed1556" %}
+{% set panel_default_background = "#E9E9E9" %}
+{% set panel_default_font = "#000" %}
 {#{% set default_light_background = "" %}#}
 {% set header_background = '#b7b6b6 url(' ~asset('bundles/pumukitgeantwebtv/images/header_bg_side.png')~'); background-size: contain;' %}
 {% set big_breadcrumbs = true %}
@@ -44,6 +46,11 @@ body {
 h1 {
     font-size: 36px;
 }
+h1.title-for-crumbs{
+    border-bottom: 0px;
+    font-weight: normal;
+    font-size: 3.8em;
+}
 .header-content{
     padding-top:10px;
 }
@@ -65,15 +72,30 @@ footer{
     color: {{default_content_font}};
 }
 {# END STATIC PAGES#}
-
+{# CATEGORIES PAGE #}
+.channel-list h2 {
+    font-size: 22px;
+    line-height: 1.36364em;
+    margin-bottom: 22px;
+￼    padding: .31818em 0;
+    font-weight: bold;
+}
+.channel-list p {
+    font-size: 16px;
+    line-height: 1.5em;
+}
+.channel-list ul {
+    margin-bottom: 20px;
+}
+{# END CATEGORIES PAGE #}
 abbr[title]  {
  text-decoration: none;
  border-bottom: none;
 }
 .number-videos.serial {
     position: absolute;
-    top: 12px;
-    left: 12px;
+    top: 0px;
+    left: 5px;
     z-index: 10;
 }
 .number-videos.serial p {
@@ -91,7 +113,6 @@ abbr[title]  {
 }
 .title.tagcatalogue {
     font-size: 1.2em;
-    font-weight: 100;
     margin-left: 20px;
     margin-top: 2px;
 }
@@ -106,7 +127,6 @@ abbr[title]  {
 
 .pumukit_mmobj:hover .info .title {
     color: grey;
-    text-decoration: underline;
     text-decoration-style: dotted;
     -moz-text-decoration-style: dotted;
     -webkit-text-decoration-style: dotted;
