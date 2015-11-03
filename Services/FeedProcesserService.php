@@ -211,7 +211,7 @@ class FeedProcesserService
             $mappedCode = $mapTable[$code];
         }
         else {
-            $mappedCode = false;
+            $mappedCode = array();
         }
         return $mappedCode;
     }
