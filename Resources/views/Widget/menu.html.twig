@@ -1,0 +1,61 @@
+<div class="row widget slidebar">
+  <ul>
+    <!-- Principal -->
+    <a href="{{ path('pumukit_webtv_index_index')}}" {{menu_selected=="pumukit_webtv_index_index"?'class="selected"':''}}>
+      {% trans %} Home{% endtrans %}
+    </a>
+
+    <!-- Announces -->
+    <a href="{{ path('pumukit_webtv_announces_latestuploads') }}" class="{{menu_selected == 'pumukit_webtv_announces_latestuploads'? 'selected' : ''}}">{% trans %} Latest Uploads {% endtrans %}</a>
+
+    <!-- By Repository Catalogue -->
+    <a href="{{ path('pumukit_geant_webtv_repositorycatalogue') }}" class="{{menu_selected == 'pumukit_geant_webtv_repositorycatalogue'? 'selected' : ''}}">{% trans %} By repository catalogue {% endtrans %}</a>
+
+    <!-- By subject Catalogue -->
+    <a href="{{ path('pumukit_webtv_categories_index') }}" class="{{menu_selected=="pumukit_webtv_categories_index"?'selected':''}}">{% trans %} By subject catalogue {% endtrans %}</a>
+
+    <!-- Info -->
+    <a href="{{ path('pumukit_webtv_staticpages_info') }}" class="{{menu_selected=="pumukit_webtv_staticpages_info"?'selected':''}}">{% trans %} Info {% endtrans %}</a>
+
+    <!-- FAQ -->
+    <a href="{{ path('pumukit_webtv_staticpages_faq') }}" class="{{menu_selected=="pumukit_webtv_staticpages_faq"?'selected':''}}">{% trans %} FAQ {% endtrans %}</a>
+
+    <!-- Contact -->
+    <a href="{{ path('pumukit_webtv_staticpages_contact') }}" class="{{menu_selected=="pumukit_webtv_staticpages_contact"?'selected':''}}">{% trans %} Contact {% endtrans %}</a>
+
+    <!-- About -->
+    <a href="{{ path('pumukit_webtv_staticpages_about') }}" class="{{menu_selected=="pumukit_webtv_staticpages_about"?'selected':''}}">{% trans %} About {% endtrans %}</a>
+
+
+{% dump(menu_selected) %}
+
+
+
+
+
+
+
+
+
+
+    <!-- Search -->
+    <a href="{{ path('pumukit_webtv_search_multimediaobjects')}}" class="{{menu_selected=="pumukit_webtv_search_multimediaobjects"?'selected':''}}">{% trans %} Go to Advanced Search {% endtrans %}</a>
+
+
+
+
+    {#<!-- Mediateca -->
+    <!--<a href="{{ path('pumukit_webtv_medialibrary_index') }}" class="{{menu_selected=="pumukit_webtv_medialibrary_index"?'selected':''}}">{% trans %} Full catalogue {% endtrans %}</a>-->
+    <!-- Live Channels -->
+    <!--{% for live in live_channels %}
+      <a href="{{ path('pumukit_live_id', {'id': live.id})}}">
+        {{ live.name | default('No title') | trans }}
+      </a>
+    {% endfor %}#}
+
+  </ul>
+</div>
+
+<div class="row widget slidebar stats">
+  {% render(controller('PumukitWebTVBundle:Widget:stats')) %}
+</div>
