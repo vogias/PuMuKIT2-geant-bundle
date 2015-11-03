@@ -175,6 +175,7 @@ class FeedSyncService
     public function syncTags(MultimediaObject $mmobj, $parsedTerena)
     {
         foreach($parsedTerena['tags'] as $parsedTag) {
+            $parsedTag = strval($parsedTag); //Sometimes they are ints.
             $tag = $this->tagRepo->findOneByCod($parsedTag);//First we search by code on the database (it should be iTunesU, but could be other)
 
             if(!isset($tag))  //Second we search by title on the database (again, it should be iTunesU, but could be other)
