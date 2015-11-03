@@ -1,0 +1,45 @@
+pumukit_web_tv_parent:
+    resource: "../../src/Pumukit/WebTVBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
+pumukit_web_tv:
+    resource: "@PumukitWebTVBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
+pumukit_webtv_default_css:
+    pattern: /webtv/css/webtv.css
+    methods: [GET]
+    defaults:
+        _controller: FrameworkBundle:Template:template
+        template: 'PumukitWebTVBundle::custom.css.twig'
+        _format: css
+
+pumukit_webtv_staticpages_info:
+    pattern: pumukit_webtv_staticpages_info
+    methods: [GET]
+    defaults:
+        _controller: FrameworkBundle:Template:template
+        template: 'PumukitWebTVBundle:static:info.html.twig'
+
+pumukit_webtv_staticpages_faq:
+    pattern: pumukit_webtv_staticpages_faq
+    methods: [GET]
+    defaults:
+        _controller: FrameworkBundle:Template:template
+        template: 'PumukitWebTVBundle:static:faq.html.twig'
+
+pumukit_webtv_staticpages_contact:
+    pattern: pumukit_webtv_staticpages_contact
+    methods: [GET]
+    defaults:
+        _controller: FrameworkBundle:Template:template
+        template: 'PumukitWebTVBundle:static:contact.html.twig'
+
+pumukit_webtv_staticpages_about:
+    pattern: pumukit_webtv_staticpages_about
+    methods: [GET]
+    defaults:
+        _controller: FrameworkBundle:Template:template
+        template: 'PumukitWebTVBundle:static:about.html.twig'
