@@ -48,11 +48,15 @@ class FeedProcesserService
         $processedObject['track_format'] = $format;
         if(isset($geantFeedObject['expressions']['manifestations']['duration'])) {
             $duration = $geantFeedObject['expressions']['manifestations']['duration']; //NOTE This field should be mandatory (CAMPUSDOMAR DOESN'T HAVE IT)
+            if(strlen($duration)<6)
+            $duration = sprintf('00:%s',$duration);
+            $duration = date_parse($duration);
+            $duration = $duration['hour']*3600 + $duration['minute']*60 + $duration['second'];
         }
         else {
-            $duration = '00:00';
+            $duration = 0;
         }
-        $processedObject['track_duration'] = $duration;
+        $processedObject['duration'] = $duration;
         $processedObject['thumbnail'] = $geantFeedObject['expressions']['manifestations']['thumbnail'];
         $processedObject['tags'] = $this->retrieveTagCodes($geantFeedObject);
         $processedObject['people'] = $this->retrievePeople($geantFeedObject);

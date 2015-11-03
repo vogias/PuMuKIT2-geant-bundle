@@ -169,6 +169,7 @@ class FeedSyncService
         $mmobj->setCopyright($parsedTerena['copyright']);
         $mmobj->setPublicDate($parsedTerena['public_date']);
         $mmobj->setRecordDate($parsedTerena['record_date']);
+        $mmobj->setDuration($parsedTerena['duration']);
     }
 
     public function syncTags(MultimediaObject $mmobj, $parsedTerena)
@@ -237,7 +238,7 @@ class FeedSyncService
             }
 
             $track->setLanguage($parsedTerena['language']);
-            $track->setDuration($parsedTerena['track_duration']);
+            $track->setDuration($parsedTerena['duration']);
             $track->setVcodec($parsedTerena['track_format']);
             $track->setPath($url);
             $track->setUrl($url);
