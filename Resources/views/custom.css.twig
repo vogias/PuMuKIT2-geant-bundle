@@ -15,32 +15,27 @@
 {% set mmobj_selected_background = '#E9E9E9' %}
 {{ parent() }}
 {# Add your own CSS rules #}
-.static_content h2{
-    font-size: 36px;
-    font-weight: bold;
-    line-height: 1.16667em;
-    padding: .5em 0;
+.icon-share:before {
+    content: '\e1214';
+    font-family: fontello;
 }
-.static_content a{
+a{
     color: {{default_light_font}};
 }
-.static_content a:hover{
+a:hover{
     color: grey;
-    text-decoration: dotted;
     border-bottom: 1px dotted grey;
 }
-.static_content{
-    font-size: 16px;
-    color: {{default_content_font}};
+a small {
+    color: {{default_light_font}};
+}
+a small:hover {
+    color: grey;
+    border-bottom: 1px dotted grey;
 }
 .static_content p {
     margin: 10px 5px;
     text-align: justify;
-}
-
-.icon-share:before {
-    content: '\e1214';
-    font-family: fontello;
 }
 body {
     font-family: "Segoe UI", "Segoe", Tahoma, Helvetica, 'Open Sans', Arial, sans-serif;
@@ -58,6 +53,19 @@ footer{
     background: #fff;
     padding: 20px 15px;
 }
+{# STATIC PAGES #}
+.static_content h2{
+    font-size: 36px;
+    font-weight: bold;
+    line-height: 1.16667em;
+    padding: .5em 0;
+}
+.static_content{
+    font-size: 16px;
+    color: {{default_content_font}};
+}
+{# END STATIC PAGES#}
+
 abbr[title]  {
  text-decoration: none;
  border-bottom: none;
@@ -66,15 +74,17 @@ abbr[title]  {
     position: absolute;
     top: 12px;
     left: 12px;
-    font-size: 0.85em;
-    width: 4.75em;
-    height: 1.25em;
+    z-index: 10;
+}
+.number-videos.serial p {
     z-index:10;
-    background: black;
     color: white;
+    background: black;
+    display: inline;
     text-align: center;
-    overflow: hidden;
     opacity: 0.50;
+    font-size: 0.85em;
+    padding: 1px 2px;
 }
 .pumukit_album .thumbnailholder {
     background: #f3f3f3;
