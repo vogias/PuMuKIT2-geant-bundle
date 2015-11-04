@@ -39,7 +39,20 @@ class AnnounceService
             ->addAnd(array('_id' => array('$in' => $ids)))
             ->sort(array('public_date' => -1))
             ->limit($limit);
-        return $queryBuilderMms->getQuery()->execute()->toArray();
+        $last = $queryBuilderMms->getQuery()->execute()->toArray();
+
+        if ($limit != count($last)) {
+            return array_merge(
+                $last,
+                $this->mmobjRepo->findStandardBy(
+                    $criteria = array('_id' => array('$nin' => $ids)),
+                    array('public_date' => -1),
+                    $limit - count($last)
+                )
+            );
+        }
+
+        return $last;
     }
 
 
