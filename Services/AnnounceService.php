@@ -6,22 +6,39 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 
 class AnnounceService
 {
-    private $seriesRepo;
     private $mmobjRepo;
+    private $dm;
 
     public function __construct(DocumentManager $documentManager)
     {
-        $dm = $documentManager;
-        $this->seriesRepo = $dm->getRepository('PumukitSchemaBundle:Series');
-        $this->mmobjRepo = $dm->getRepository('PumukitSchemaBundle:MultimediaObject');
+        $this->dm = $documentManager;
+        $this->mmobjRepo = $this->dm->getRepository('PumukitSchemaBundle:MultimediaObject');
     }
 
 
     public function getLast($limit = 3)
     {
+        $mmobjColl = $this->dm->getDocumentCollection('PumukitSchemaBundle:MultimediaObject');
+        $filters = $this->dm->getFilterCollection()
+            ->getFilterCriteria($this->mmobjRepo->getClassMetadata());
+
+        $pipeline = array(
+            array('$match' => $filters),
+            array('$sort' => array('public_date' => 1)),
+            array('$group' => array('_id' => '$series', 'id' => array('$first' => '$_id'))),
+            array('$limit' => $limit), 
+        );
+        $aggregation = $mmobjColl->aggregate($pipeline);
+    
+        $ids = array();
+        foreach($aggregation as $element) {
+          $ids[] = $element['id'];
+        }
+        
         $queryBuilderMms = $this->mmobjRepo->createStandardQueryBuilder()
-          ->sort(array('public_date' => -1))
-          ->limit($limit);
+            ->addAnd(array('_id' => array('$in' => $ids)))
+            ->sort(array('public_date' => -1))
+            ->limit($limit);
         return $queryBuilderMms->getQuery()->execute()->toArray();
     }
 
