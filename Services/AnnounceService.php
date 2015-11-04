@@ -19,55 +19,19 @@ class AnnounceService
 
     public function getLast($limit = 3)
     {
-        $lastMms = $this->mmobjRepo->createStandardQueryBuilder()
-        //->group(array(),array('count' => 0))
-        ->sort(array('public_date' => -1))
-        ->limit($limit)
-        ->getQuery()->execute();
-
-        $return = array();
-        $i = 0;
-        $iMms = 0;
-        $iSeries = 0;
-
-        $return = $lastMms;
-
-        return $return;
+        $queryBuilderMms = $this->mmobjRepo->createStandardQueryBuilder()
+          ->sort(array('public_date' => -1))
+          ->limit($limit);
+        return $queryBuilderMms->getQuery()->execute()->toArray();
     }
+
 
     public function getLatestUploadsByDates($dateStart, $dateEnd)
     {
-        $queryBuilderMms = $this->mmobjRepo->createQueryBuilder();
-        $queryBuilderSeries = $this->seriesRepo->createQueryBuilder();
-
-        $queryBuilderMms->field('public_date')->range($dateStart, $dateEnd);
-        $queryBuilderMms->field('tags.cod')->equals('PUDENEW');
-        $queryBuilderSeries->field('public_date')->range($dateStart, $dateEnd);
-        $queryBuilderSeries->field('announce')->equals(true);
-
-        $lastMms = $queryBuilderMms->getQuery()->execute();
-        $lastSeries = $queryBuilderSeries->getQuery()->execute();
-
-        $last = array();
-
-        foreach ($lastSeries as $serie) {
-            $last[] = $serie;
-        }
-       foreach ($lastMms as $mm) {
-            $last[] = $mm;
-        }
-
-        usort($last, function ($a, $b) {
-            $date_a = $a->getPublicDate();
-            $date_b = $b->getPublicDate();
-            if ($date_a == $date_b) {
-                return 0;
-            }
-
-            return $date_a < $date_b ? 1 : -1;
-        });
-
-        return $last;
+        $queryBuilderMms = $this->mmobjRepo->createStandardQueryBuilder()
+          ->field('public_date')->range($dateStart, $dateEnd)
+          ->sort(array('public_date' => -1));
+        return $queryBuilderMms->getQuery()->execute()->toArray();
     }
 
     /**
@@ -88,7 +52,6 @@ class AnnounceService
             $dateStart->modify('first day of last month');
             $dateEnd->modify('last day of last month');
             $last = $this->getLatestUploadsByDates($dateStart, $dateEnd);
-
         } while (empty($last) && $counter < 24);
 
         return array($dateEnd, $last);
