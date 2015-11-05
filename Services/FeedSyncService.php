@@ -195,7 +195,7 @@ class FeedSyncService
                 foreach($mappedItunesTags as $itunesTag) {
                     $iTag = $this->tagRepo->findOneByCod($itunesTag);
                     if(!isset($iTag)) {
-                        throw new \Exception(sprintf('Error! The parsed iTunes tag with code: %s  doesnt exists on PuMuKIT. Did you initialize the iTunes repo?'));
+                        throw new \Exception(sprintf('Error! The parsed iTunes tag with code: %s  doesnt exists on PuMuKIT. Did you initialize the iTunes repo?' ,$itunesTag));
                     }
                     $this->tagService->addTagToMultimediaObject($mmobj, $iTag->getId(), false);
                 }
@@ -230,28 +230,30 @@ class FeedSyncService
     {
         $url = $parsedTerena['track_url'];
         $urlExtension = pathinfo((parse_url($parsedTerena['track_url'])['path']), PATHINFO_EXTENSION);
-        //If the url is an url to an iframe
-        if( $urlExtension == 'mp4' || $urlExtension == 'mp3' ) {
-            $track = $mmobj->getTrackWithTag('geant_track');
-            if(!isset($track)) {
-                $track = new Track();
-                $mmobj->addTrack($track);
-            }
 
-            $track->setLanguage($parsedTerena['language']);
-            $track->setDuration($parsedTerena['duration']);
-            $track->setVcodec($parsedTerena['track_format']);
-            $track->setPath($url);
-            $track->setUrl($url);
+        $track = $mmobj->getTrackWithTag('geant_track');
+        if(!isset($track)) {
+            $track = new Track();
+            $mmobj->addTrack($track);
+        }
+        $track->addTag('geant_track');
+        $track->setLanguage($parsedTerena['language']);
+        $track->setDuration($parsedTerena['duration']);
+        $track->setVcodec($parsedTerena['track_format']);
+        $track->setPath($url);
+        $track->setUrl($url);
+
+        if( $urlExtension == 'mp4' || $urlExtension == 'mp3' ) {
             $track->addTag('display');
-            $track->addTag('geant_track');
-            $this->dm->persist($track);
         }
         else {
             $mmobj->setProperty('opencast', true); //Workaround to prevent editing the Schema Filter for now.
             $mmobj->setProperty('iframeable', true);
             $mmobj->setProperty('iframe_url', $url);
         }
+        $track->setOnlyAudio('false');
+        $this->dm->persist($track);
+        $track->addTag('geant_track');
     }
 
     public function syncThumbnail(MultimediaObject $mmobj, $parsedTerena)
