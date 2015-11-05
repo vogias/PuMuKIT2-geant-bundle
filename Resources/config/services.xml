@@ -10,9 +10,11 @@
             <parameter key="title">GÉANT Association</parameter>
             <parameter key="url">http://www.geant.org/Pages/Home.aspx</parameter>
         </parameter>
+        <parameter key="pumukit_web_tv.linktagtosearch">true</parameter>
     </parameters>
 
     <services>
+
         <service id="pumukit_web_tv.geant.feedsyncclient" class="Pumukit\Geant\WebTVBundle\Services\FeedSyncClientService">
           <argument>%geant.feedsyncservice.baseurl%</argument>
         </service>
