@@ -12,4 +12,5 @@ parameters:
     categories_tag_cod:        ITUNESU       # Cod of Root Tag to create the Categories page.
     categories.list_general_tags:  true        # If true, adds a 'general tag' to each category.
     pumukit_web_tv.breadcrumbs_home_title:  'OER Portal'
-    search.parent_tag.cod: ITUNESU
+    search.parent_tag.cod:     ITUNESU
+    search.parent_tag_2.cod:     PROVIDER
