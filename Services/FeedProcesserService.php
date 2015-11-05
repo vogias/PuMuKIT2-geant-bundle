@@ -183,29 +183,29 @@ class FeedProcesserService
     {
         $code = substr($code,0,3);
         $mapTable = array('U11' => array('108101'),
-                          'U12' => array('108000'),
+                          'U12' => array('108'),
                           'U21' => array('109101'),
                           'U22' => array('109108'),
                           'U23' => array('109104'),
                           'U24' => array('109103'),
                           'U25' => array('109102','109107'),
                           'U31' => array('109100'),
-                          'U32' => array('103000'),
-                          'U33' => array('101000'),
-                          'U51' => array('105000'),
+                          'U32' => array('103'),
+                          'U33' => array('101'),
+                          'U51' => array('110107'),
                           'U53' => array('100100'),
                           'U54' => array('109106'),
-                          'U55' => array('104000'),
-                          'U56' => array('111000'),
+                          'U55' => array('104'),
+                          'U56' => array('111'),
                           'U57' => array('106109'),
-                          'U58' => array('112000'),
+                          'U58' => array('112'),
                           'U59' => array('110101'),
                           'U61' => array('110103'),
-                          'U62' => array('102000'),
+                          'U62' => array('102'),
                           'U63' => array('110105'),
                           'U71' => array('105102'),
                           'U72' => array('105101'),
-                          'U92' => array('111000')
+                          'U92' => array('111')
         );
         if(isset($mapTable[$code])) {
             $mappedCode = $mapTable[$code];
