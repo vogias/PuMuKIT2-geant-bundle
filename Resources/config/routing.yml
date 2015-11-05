@@ -12,34 +12,38 @@ pumukit_webtv_default_css:
     pattern: /webtv/css/webtv.css
     methods: [GET]
     defaults:
-        _controller: FrameworkBundle:Template:template
+        _controller: PumukitWebTVBundle:Template:template
         template: 'PumukitWebTVBundle::custom.css.twig'
         _format: css
 
 pumukit_webtv_staticpages_info:
-    pattern: pumukit_webtv_staticpages_info
+    pattern: info
     methods: [GET]
     defaults:
-        _controller: FrameworkBundle:Template:template
+        _controller: PumukitWebTVBundle:Template:template
         template: 'PumukitWebTVBundle:static:info.html.twig'
+        title: 'Info'        
 
 pumukit_webtv_staticpages_faq:
-    pattern: pumukit_webtv_staticpages_faq
+    pattern: faq
     methods: [GET]
     defaults:
-        _controller: FrameworkBundle:Template:template
+        _controller: PumukitWebTVBundle:Template:template
         template: 'PumukitWebTVBundle:static:faq.html.twig'
+        title: 'FAQ'
 
 pumukit_webtv_staticpages_contact:
-    pattern: pumukit_webtv_staticpages_contact
+    pattern: contact
     methods: [GET]
     defaults:
-        _controller: FrameworkBundle:Template:template
+        _controller: PumukitWebTVBundle:Template:template
         template: 'PumukitWebTVBundle:static:contact.html.twig'
-
+        title: 'Contact'
+        
 pumukit_webtv_staticpages_about:
-    pattern: pumukit_webtv_staticpages_about
+    pattern: about
     methods: [GET]
     defaults:
-        _controller: FrameworkBundle:Template:template
+        _controller: PumukitWebTVBundle:Template:template
         template: 'PumukitWebTVBundle:static:about.html.twig'
+        title: 'About'
