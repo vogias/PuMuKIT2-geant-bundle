@@ -26,13 +26,19 @@ a{
 }
 a:hover{
     color: grey;
+    border-bottom: 1px dotted grey;
 }
 a small {
     color: {{default_light_font}};
 }
 a small:hover {
     color: grey;
+    border-bottom: 1px dotted grey;
 }
+.index_container a:hover {
+    border-bottom: none;
+}
+
 .static_content p {
     margin: 10px 5px;
     text-align: justify;
@@ -122,7 +128,9 @@ abbr[title]  {
     font-family: 'Arial Narrow', Arial;
     font-stretch: condensed;
 }
-
+.mmobj_thumbnail_title:hover {
+    border-bottom: 1px dotted grey;
+}
 .pumukit_mmobj:hover .info .title {
     color: grey;
     text-decoration-style: dotted;
