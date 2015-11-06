@@ -42,7 +42,7 @@
           <argument type="service" id="translator" />
           <argument>%pumukit_web_tv.breadcrumbs_all_title%</argument>
           <argument>%pumukit_web_tv.breadcrumbs_all_route%</argument>
-          <argument>%pumukit_web_tv.breadcrumbs_home_title%</argument>
+          <argument>%breadcrumbs_home_title%</argument>
           <argument>%pumukit_geant_webtv.breadcrumbs_parentweb%</argument>
         </service>
 
