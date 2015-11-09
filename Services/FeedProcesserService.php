@@ -160,7 +160,12 @@ class FeedProcesserService
     public function retrievePeople($geantFeedObject)
     {
         $people = array();
-        if(isset($geantFeedObject['contributors'])) {
+        if (isset($geantFeedObject['contributors'])) {
+            if (isset($geantFeedObject['contributors']['name'])) {
+                $people[0]['name'] = $geantFeedObject['contributors']['name'];
+                $people[0]['role'] = isset($geantFeedObject['contributors']['role']) ? mb_strtolower($geantFeedObject['contributors']['role']) : '';
+                return $people;
+            }
             foreach($geantFeedObject['contributors'] as $id=>$contributor) {
                 if(!isset($contributor['name'])) {
                     continue;
