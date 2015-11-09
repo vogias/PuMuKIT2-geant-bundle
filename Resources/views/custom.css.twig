@@ -2,8 +2,8 @@
 
 {% block body %}
 
-{# HERE you can set your variables to be overrided #}
-{# Examples: #}
+
+{% set default_contrast_background = default_contrast_background | default("#004361") %}
 {% set content_max_width = "1350px" %}
 {% set default_content_font = "#004361" %}
 {% set default_light_font = "#ed1556" %}
@@ -139,6 +139,26 @@ abbr[title]  {
     font-size: 1.2em;
     margin-left: 20px;
     margin-top: 2px;
+}
+.thumbnail {
+    height: 103px;
+    width: 137px;
+    padding: 2px;
+}
+.thumbnail img.thumbnailimg{
+    height: 100%;
+    max-width: 137px;
+    max-height: 103px;
+    padding: 0px;
+}
+.thumbnailholder {
+    width: 133px;
+    height: 99px;
+    top: 2px;
+    left: 2px;
+}
+.video-duration {
+    display: none;
 }
 .info .title, .info .title a {
     color: {{default_light_font}};
