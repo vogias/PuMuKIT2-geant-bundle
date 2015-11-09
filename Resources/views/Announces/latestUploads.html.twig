@@ -1,0 +1,19 @@
+{% extends 'PumukitWebTVBundle::layout.html.twig' %}
+
+{% block javascripts %}
+  {{ parent() }}
+  <script src="{{ asset('bundles/pumukitwebtv/js/announces_ajax.js') }}" type="text/javascript"></script>
+{% endblock %}
+
+{% block body %}
+  <h1 class="title-for-crumbs">{{template_title}}</h1>
+  <p class="main_menu_text">
+  Latest recordings made by this service, or provided by other organizations, which are available to the audience, ordered by recording or publishing date
+</p>
+  <div class="announces" id="announces">
+  </div>
+  <div id="announces_loading" style="display:none"><img class="center-block" src="{{ asset('bundles/pumukitwebtv/images/icons/spinner.gif') }}"/></div>
+  <script type="text/javascript">
+   var url_latestuploads_pager = "{{ path('pumukit_webtv_announces_latestuploads_pager') }}";
+  </script>
+{% endblock %}
