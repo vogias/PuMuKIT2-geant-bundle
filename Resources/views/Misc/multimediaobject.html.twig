@@ -1,0 +1,47 @@
+<!--Objeto multimedia-->
+{% set col_mapper = {'1': 'col-md-12', '2': 'col-md-6', '3': 'col-md-4', '4': 'col-md-3'} %}
+{% set col_class = ( col_mapper[cols|default('1')] | default(col_mapper['1'] ) ) %}
+<div class="{{ col_class }}">
+  <a href="{{ path('pumukit_webtv_multimediaobject_index', {'id': object.id}) }}">
+    <div class="pumukit_mmobj">
+      <div class="thumbnail">
+        <span class="play_icon" alt=""></span>
+        <span class="video-duration">{{ object.durationString }}</span>
+        <img alt="serial_pic" class="serial thumbnailimg" src="{{ object|first_url_pic(true) }}"/>
+        <div class="thumbnailholder" ></div>
+      </div>
+      <div class="info">
+        <div class="title" title="{{object.description}}">
+            <div class="ellipsedtext-parent">
+                <div class="ellipsedtext-leftmargin"></div>
+                <div class="ellipsedtext-testwrapper">
+                    <div class="ellipsedtext-text">
+                        <div class="ellipsedtext-textstopper"></div>
+                        <span class="mmobj_thumbnail_title">{{object.title | default('No title')|trans}}</span>
+                        <div class="ellipsedtext-endtext"></div>
+                    </div>
+                </div>
+                <div class="ellipsedtext-overflowdetector">
+                    <div class="ellipsedtext-ellipse">...</div>
+                </div>
+            </div>
+        </div>
+        <div class="subtitle">
+            {% if object.subtitle is not empty %}
+            <abbr title="{{object.subtitle}}">{{object.subtitle}}</abbr>
+            {% else %}
+            <abbr title="{{object.series.title}}">{{object.series.title}}</abbr>
+            {% endif %}
+        </div>
+        <div class="date mmobj">
+          {{object.recordDate|date("d/m/Y")}}
+        </div>
+        <div class=" mmobj-numviewed">{% set num_viewed = object.numview %}
+            {% transchoice num_viewed %}
+            {1} Viewed one time. |[0, Inf]Viewed %num_viewed% times
+            {% endtranschoice %}
+        </div>
+      </div>
+    </div>
+  </a>
+</div>
