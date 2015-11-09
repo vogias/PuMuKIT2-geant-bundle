@@ -26,9 +26,11 @@
       <div class="row">
     	{% include 'PumukitWebTVBundle:Search:list.html.twig' %}
       </div>
+      {% if objects|length > 0%}
       <div class="row">
         {% include 'PumukitWebTVBundle:Misc:pager.html.twig' %}
       </div>
+      {% endif %}
     </div>
   </div>
 {% endblock %}
