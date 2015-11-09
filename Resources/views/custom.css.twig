@@ -61,8 +61,28 @@ h1.title-for-crumbs{
 footer{
     max-width: {{content_max_width}};
     margin: 0 auto;
-    background: #fff;
-    padding: 20px 15px;
+    background: #004361;
+    color: #fff;
+    padding: 0px 10px 20px;
+}
+.footer_row {
+    background: #004361;
+    color: #fff;
+}
+#footer-links a{
+    color: #fff;
+}
+#footer-links li {
+    float: left;
+    list-style-type: none;
+    background-image: url('{{asset('bundles/pumukitgeantwebtv/images/bullet.png')}}');
+    background-repeat: no-repeat;
+    background-position: left;
+    padding-right: 5px;
+    padding-left: 11px;
+}
+#footer-links li:first-child {
+background: none;
 }
 {# STATIC PAGES #}
 .static_content h2{
