@@ -27,6 +27,5 @@ class CatalogueController extends Controller
         }
         $providerTags = $parentTag->getChildren();
         return array('provider_tags' => $providerTags);
-        /*echo "<pre>W EEEEE WEEE QWE qwe qwe qwe QWE qwe qwe</pre>";*/
     }
 }
