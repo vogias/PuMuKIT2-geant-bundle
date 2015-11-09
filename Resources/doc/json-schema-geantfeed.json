@@ -12,18 +12,141 @@
             "description": "The provider of the Geant Feed Object. The PuMuKIT Multimedia Object will be tagged with this provider.",
             "type": "string"
         },
-        "status": {
-            "description": "The status of the Geant Feed Object (published, hidden, blocked). Error if not equal to 'published'.",
-            "type": "string"
-        },
         "creationDate": {
             "description": "The date set for the Geant Feed Object. Must follow the ISO 8601 standard to be parsed correctly (YYYY-MM-DD).",
             "type": "string"
         },
-        "languageBlocks": {
+        "contributors": {
+            "description": "An array of contributors to the Geant Feed Object (author, actors, producer,...)",
             "type": "array",
-            "items":
+            "items": {
+                "description": "A contributor to the Geant Feed Object",
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "description": "The name of the contributor.",
+                        "type": "string"
+                    },
+                    "role": {
+                        "description": "The 'role' of the contributor. If the role is not found in PuMuKIT, the contributor role will be set to 'participant'",
+                        "enum": [ "writer", "lecturer", "presenter", "publisher", "postproduction", "coordinator", "actor", "producer", "participant", "author" ]
+                    }
+                },
+                "required": ["name"]
+            }
+        },
+        "tokenBlock": {
+            "description": "An object containing info about the tags added to the Geant Feed Object.",
+            "type": "object",
+            "properties": {
+                "taxonPaths": {
+                    "description": "An array of tags for the Geant Feed Object",
+                    "type": "array",
+                    "items": {
+                        "description": "UNESCO or iTunesU subject codes. The code must be the numeric code: http://unesdoc.unesco.org/images/0008/000829/082946eb.pdf    https://help.apple.com/itunesu/sitemanager/#/itu337EEAE0-035A-4660-B53D-46A13A7721E5",
+                        "type": "string"
+                    }
+                }
+            },
+            "required": ["taxonPaths"]
+        },
+        "languageBlocks": {
+            "description": "An array of language blocks with each key being the language of the elements it contains. The keys must follow the ISO 639-1 format (two characters)",
+            "type": "array",
+            "items": {
+                "description": "A language Block for the Geant Feed Object. Contains the title, description (optional) and the keywords(optional).",
+                "type": "object",
+                "properties": {
+                    "title": { "type": "string" },
+                    "description": { "type": "string" },
+                    "keywords": {
+                        "type": "array",
+                        "items": { "type": "string" }
+                    }
+                },
+                "required": ["title"]
+            },
+            "minItems": 1
+        },
+        "rights": {
+            "description": "An object containing data about the copyright/license of a Geant Feed Object.",
+            "type": "object",
+            "properties": {
+                "description": {
+                    "description": "An array containing the license texts/urls. Each key corresponds to the language of the element it contains. The keys must follow the ISO 639-1 format (two characters)",
+                    "type": "array",
+                    "items": {
+                        "description": "Field containing the license text/url",
+                        "type": "string"
+                    }
+                },
+                "copyright": {
+                    "description": "The copyright text.",
+                    "type": "string"
+                }
+            },
+            "required": ["description"]
+        },
+        "expressions": {
+            "description": "An object containing data about the language and playable resources of a Geant Feed Object.",
+            "type": "object",
+            "properties": {
+                "language": {
+                    "description": "The language code of the Geant Feed Object playable resource. It must follow the ISO 639-1 format (two characters)",
+                    "type": "string"
+                },
+                "manifestations": {
+                    "description": "An object with data about the playable resources of a Geant Feed Object.",
+                    "type": "object",
+                    "properties": {
+                        "items": {
+                            "description": "An object that contains the url to the playable resource (Either an iframe or a file)",
+                            "type": "object",
+                            "properties": {
+                                "url": {
+                                    "description": "The url to the playable resource. The playable resource can be a file or an url valid to be embedded on an iframe.",
+                                    "type": "string"
+                                }
+                            },
+                            "required": ["url"]
+                        },
+                        "thumbnail": {
+                            "description": "An url to the thumbnail for the video.",
+                            "type": "string"
+                        },
+                        "duration": {
+                            "description": "The duration of the playable resource. The format must follow the ISO 8601 extended time format ([hh]:[mm]:[ss]).",
+                            "type": "string"
+                        },
+                        "format": {
+                            "description": "The MIME content-type of the playable resource. (E.g: video/mp4)",
+                            "type": "string"
+                        },
+                        "subtitles": {
+                            "description": "An array with subtitles",
+                            "type": "object",
+                            "properties": {
+                                "language": {
+                                    "description": "The language of the subtitle. It must follow the ISO 639-1 two letter code format.",
+                                    "type": "string"
+                                },
+                                "url": {
+                                    "description": "The url to the VTT or SRT subtitles file.",
+                                    "type": "string"
+                                }
+                            },
+                            "required": ["language", "url"]
+                        }
+                    },
+                    "required": ["items","thumbnail","duration","format"]
+                }
+            },
+            "required": ["language", "manifestations"]
+        },
+        "learningObjectives": {
+            "description": "Educational Level of the content (HE-basic, HE-medium, PhD,…). Complexity codes, TBD",
+            "type": "string"
         }
     },
-    "required": ["identifier", "set", "status", "creationDate"]
+    "required": ["identifier", "set", "creationDate", "tokenBlock", "languageBlocks", "rights", "expressions" ]
 }
