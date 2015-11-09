@@ -20,7 +20,7 @@ parameters:
     menu.search_title:  'Search'                     # 'Search' option title for the menu widget.
     menu.mediateca_title:  'Full Catalogue'          # 'Mediateca' option title for the menu widget.
     menu.categories_title:  'By subject catalogue'   # 'Categories' option title for the menu widget.
-    pumukit_web_tv.linktagtosearch: false
+    pumukit_web_tv.linktagtosearch:  true
     pumukit_web_tv.breadcrumbs_parentweb:
         title: 'GÉANT Association'
         url: 'http://www.geant.org/Pages/Home.aspx'
