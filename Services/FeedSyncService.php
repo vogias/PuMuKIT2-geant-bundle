@@ -66,7 +66,6 @@ class FeedSyncService
             $newTag->setDisplay(false);
             $newTag->setTitle('Provider');
             $this->dm->persist($newTag);
-            $this->dm->flush();
             $this->providerRootTag = $newTag;
         }
         $this->webTVTag = $this->tagRepo->findOneByCod('PUCHWEBTV');
@@ -78,22 +77,31 @@ class FeedSyncService
     public function sync($limit = 0)
     {
         $terenaGenerator = $this->feedClientService->getFeed( $limit );
+        $count = 0;
         foreach( $terenaGenerator as $terena) {
+	$count++;
             try {
                 $parsedTerena = $this->feedProcesserService->process( $terena );
             } catch (\Exception $e) {
                 //Log exception error.
-                echo "\nPARSING GENERATOR EXCEPTION:\n$e\n";
-                continue;
+	        echo sprintf("\nPARSING GENERATOR EXCEPTION: \n-Line: %s\n----\n-Message: %s \n----\n-Code: %s\n----\n",$e->getMessage(), $e->getLine(), $e->getCode());
+	        continue;
             }
             try {
                 $this->syncMmobj($parsedTerena);
+	        if($count % 10) {
+  		    $this->dm->flush();
+		    $this->dm->clear();
+		}
             }
             catch (\Exception $e) {
-                echo "\nSYNC GENERATOR EXCEPTION:\n$e\n";
+	        echo sprintf("\nSYNC GENERATOR EXCEPTION: \n-Line: %s\n----\n-Message: %s \n----\n-Code: %s\n----\n",$e->getMessage(), $e->getLine(), $e->getCode());
                 continue;
             }
         }
+  	$this->dm->flush();
+        $this->dm->clear();
+
     }
 
     public function syncMmobj( $parsedTerena )
@@ -117,7 +125,7 @@ class FeedSyncService
                 $series->setProperty('geant_provider',$parsedTerena['provider']);
                 $series->setTitle($parsedTerena['provider']);
             }
-            $mmobj = $factory->createMultimediaObject($series);
+            $mmobj = $factory->createMultimediaObject($series, false);
             $mmobj->setProperty('geant_id', $parsedTerena['identifier']);
 
             //Add 'provider' tag
@@ -130,13 +138,12 @@ class FeedSyncService
                 $providerTag->setDisplay(true);
                 $providerTag->setMetatag(false);
                 $this->dm->persist($providerTag);
-                $this->dm->flush();
             }
-            $this->tagService->addTagToMultimediaObject($mmobj, $providerTag->getId(), true);
+            $this->tagService->addTagToMultimediaObject($mmobj, $providerTag->getId(), false);
         }
         //PUBLISH
         $mmobj->setStatus(MultimediaObject::STATUS_PUBLISHED);
-        $this->tagService->addTagToMultimediaObject($mmobj, $this->webTVTag->getId(), true);
+        $this->tagService->addTagToMultimediaObject($mmobj, $this->webTVTag->getId(), false);
 
         //METADATA
         $this->syncMetadata($mmobj, $parsedTerena);
@@ -155,7 +162,6 @@ class FeedSyncService
 
         //SAVE CHANGES
         $this->dm->persist($mmobj);
-        $this->dm->flush();
     }
 
     public function syncMetadata(MultimediaObject $mmobj, $parsedTerena)
@@ -222,7 +228,7 @@ class FeedSyncService
                 $role = $this->roleRepo->findOneByCod('Participant'); // <-- This cod is ucfirst, but others are lowercase.
             }
 
-            $this->personService->createRelationPerson($person, $role, $mmobj);
+            $this->personService->createRelationPerson($person, $role, $mmobj, false);
         }
     }
 
@@ -261,7 +267,7 @@ class FeedSyncService
         $url = $parsedTerena['thumbnail'];
         $pics = $mmobj->getPics();
         if (0 === count($pics)) {
-            $mmobj = $this->mmsPicService->addPicUrl($mmobj, $url);
+            $mmobj = $this->mmsPicService->addPicUrl($mmobj, $url, false);
         } else {
             foreach($pics as $pic) break; //Woraround to get the first element.
             $pic->setUrl($url);
