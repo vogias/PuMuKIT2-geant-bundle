@@ -82,6 +82,9 @@ class FeedSyncService
         $time_started = microtime(true);
         $count = 0;
         $total = $this->feedClientService->getFeedTotal($provider);
+        if($limit == 0 || $limit > $total){
+            $limit = $total;
+        }
         echo "Syncing with Geant Feed...";
         $terenaGenerator = $this->feedClientService->getFeed( $limit, $provider );
         foreach( $terenaGenerator as $terena) {
