@@ -187,7 +187,7 @@ class FeedProcesserService
     public function mapCodeToItunes($code)
     {
         $code = substr($code,0,3);
-        $mapTable = array('U11' => array('108101'),
+        $mapTable = array('U11' => array('114105', '108'),
                           'U12' => array('108'),
                           'U21' => array('109101'),
                           'U22' => array('109108'),
@@ -201,15 +201,15 @@ class FeedProcesserService
                           'U53' => array('100100'),
                           'U54' => array('109106'),
                           'U55' => array('104'),
-                          'U56' => array('111'),
+                          'U56' => array('110100'),
                           'U57' => array('106109'),
                           'U58' => array('112'),
                           'U59' => array('110101'),
                           'U61' => array('110103'),
-                          'U62' => array('102'),
+                          'U62' => array('102','107'),
                           'U63' => array('110105'),
-                          'U71' => array('105102'),
-                          'U72' => array('105101'),
+                          'U71' => array('114102'),
+                          'U72' => array('114'),
                           'U92' => array('111')
         );
         if(isset($mapTable[$code])) {
