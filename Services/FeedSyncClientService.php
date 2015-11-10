@@ -35,7 +35,7 @@ class FeedSyncClientService
         $page = 1;
         do {
             //Gets page (Exception thrown if error)
-            $out = $this->getFeedPage($page);
+            $out = $this->getFeedPage($page, 500);
             $json = json_decode($out,true);
 
             //Process page. (Yields a Terena Object) TODO
