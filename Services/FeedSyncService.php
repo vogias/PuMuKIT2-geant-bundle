@@ -75,7 +75,7 @@ class FeedSyncService
         }
     }
 
-    public function sync($limit = null)
+    public function sync($limit = 0)
     {
         $terenaGenerator = $this->feedClientService->getFeed( $limit );
         foreach( $terenaGenerator as $terena) {

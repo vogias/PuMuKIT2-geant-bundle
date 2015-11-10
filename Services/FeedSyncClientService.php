@@ -28,7 +28,7 @@ class FeedSyncClientService
     *
     * For more information, see: http://php.net/manual/en/language.generators.overview.php
     */
-    public function getFeed($limit = null)
+    public function getFeed($limit = 0)
     {
         $time_started = microtime(true);
         $i = 1;
@@ -46,14 +46,14 @@ class FeedSyncClientService
             }
             $page++;
             $this->showProgressEstimateDuration ($time_started, $i, $total);
-        } while($i <= $limit && $i <= $total);
+        } while(($limit == 0 || $i <= $limit) && $i <= $total);
     }
 
     /**
     * Returns a feed page from the feedUrl using curl
     * Throws exception if Request gives an error.
     */
-    protected function getFeedPage($page, $pageSize=1000){
+    protected function getFeedPage($page, $pageSize=10){
         $url = sprintf("%s%s%s", $this->feedUrl, '?', http_build_query(array('q' => '*', 'page_size' => $pageSize, 'page' => $page), '', '&'));
         //SOLO UPV
         //$url = sprintf("%s%s%s", $this->feedUrl, '?set=UPV&',  http_build_query(array('page' => $page), '', '&'));

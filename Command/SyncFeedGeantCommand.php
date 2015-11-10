@@ -25,7 +25,7 @@ class SyncFeedGeantCommand extends ContainerAwareCommand
         $output->writeln($formattedBlock);
         //EXECUTE SERVICE
         $feedSyncService = $this->getContainer()->get('pumukit_web_tv.geant.feedsync');
-        $feedSyncService->sync(100);
+        $feedSyncService->sync();
         //SHUTDOWN HAPPILY
     }
 
