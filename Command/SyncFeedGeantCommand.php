@@ -15,7 +15,26 @@ class SyncFeedGeantCommand extends ContainerAwareCommand
         $this
         ->setName('geant:syncfeed:import')
         ->setDescription('Imports Geant feed and publishes on PuMuKIT.')
-        ->setHelp( $this->getCommandHelpText() );
+        ->setHelp( $this->getCommandHelpText() )
+        ->addOption(
+                'Wall',
+                'W',
+                InputOption::VALUE_NONE,
+                'If set, the task will output the Warnings.'
+            )
+        ->addOption(
+                'limit',
+                'l',
+                InputOption::VALUE_REQUIRED,
+                'If set, the task will only import "limit" number of elements.',
+                0
+            )
+        ->addOption(
+                'provider',
+                'P',
+                InputOption::VALUE_REQUIRED,
+                'If set, the task will import elements from a particular provider only.'
+            );
     }
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -25,7 +44,10 @@ class SyncFeedGeantCommand extends ContainerAwareCommand
         $output->writeln($formattedBlock);
         //EXECUTE SERVICE
         $feedSyncService = $this->getContainer()->get('pumukit_web_tv.geant.feedsync');
-        $feedSyncService->sync();
+        $optWall = $input->getOption('Wall')?true:false;
+        $limit = $input->getOption('limit')?:0;
+        $provider = $input->getOption('provider');
+        $feedSyncService->sync($limit, $optWall, $provider);
         //SHUTDOWN HAPPILY
     }
 

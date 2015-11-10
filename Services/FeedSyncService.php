@@ -35,6 +35,7 @@ class FeedSyncService
 
     private $providerRootTag;
     private $webTVTag;
+    private $optWall; //If true, prints warnings.
 
     public function __construct(FactoryService $factoryService, TagService $tagService, PersonService $personService, MultimediaObjectPicService $mmsPicService, FeedSyncClientService $feedClientService,
     FeedProcesserService $feedProcesserService,  DocumentManager $dm)
@@ -72,34 +73,45 @@ class FeedSyncService
         if(!isset($this->webTVTag)) {
             throw new \Exception('Tag: PUCHWEBTV does not exists. Did you initialize the repository? (pumukit:init:repo)');
         }
+        $this->optWall=false;
     }
 
-    public function sync($limit = 0)
+    public function sync($limit = 0, $optWall = false, $provider = null)
     {
-        $terenaGenerator = $this->feedClientService->getFeed( $limit );
+        $this->optWall = $optWall;
+        $time_started = microtime(true);
         $count = 0;
+        $total = $this->feedClientService->getFeedTotal($provider);
+        echo "Syncing with Geant Feed...";
+        $terenaGenerator = $this->feedClientService->getFeed( $limit, $provider );
         foreach( $terenaGenerator as $terena) {
-	$count++;
+            $count++;
+            if($count > $limit) {
+                break;
+            }
             try {
                 $parsedTerena = $this->feedProcesserService->process( $terena );
             } catch (\Exception $e) {
                 //Log exception error.
-	        echo sprintf("\nPARSING GENERATOR EXCEPTION: \n-Line: %s\n----\n-Message: %s \n----\n-Code: %s\n----\n",$e->getMessage(), $e->getLine(), $e->getCode());
-	        continue;
+                echo sprintf("\nPARSING GENERATOR EXCEPTION: \n-Message: %s \n",$e->getMessage());
+                continue;
             }
             try {
                 $this->syncMmobj($parsedTerena);
-	        if($count % 10) {
-  		    $this->dm->flush();
-		    $this->dm->clear();
-		}
             }
             catch (\Exception $e) {
-	        echo sprintf("\nSYNC GENERATOR EXCEPTION: \n-Line: %s\n----\n-Message: %s \n----\n-Code: %s\n----\n",$e->getMessage(), $e->getLine(), $e->getCode());
+                echo sprintf("\nSYNC GENERATOR EXCEPTION: \n-Message: %s \n----",$e->getMessage());
                 continue;
             }
+            if($count % 50 == 0) {
+                $this->dm->flush();
+                $this->dm->clear();
+            }
+            if($count % 10 == 0) {
+                $this->showProgressEstimateDuration ($time_started, $count, $total);
+            }
         }
-  	$this->dm->flush();
+        $this->dm->flush();
         $this->dm->clear();
 
     }
@@ -191,7 +203,9 @@ class FeedSyncService
             $tag = $this->tagRepo->findOneByCod(sprintf('U%s',$parsedTag));
 
             if(!isset($tag)) { //If we can't find it here, all hope is lost. We log it and continue.
-                echo "\n".sprintf('Warning: The tag with cod/title %s from the Feed ID:%s does not exist on PuMuKIT',$parsedTag,$parsedTerena['identifier']);
+                if($this->optWall){
+                    echo "\n".sprintf('Warning: The tag with cod/title %s from the Feed ID:%s does not exist on PuMuKIT',$parsedTag,$parsedTerena['identifier']);
+                }
                 continue;
             }
 
@@ -273,5 +287,25 @@ class FeedSyncService
             $pic->setUrl($url);
             $this->dm->persist($pic);
         }
+    }
+
+    /**
+    * Prints on screen an estimated duration of the script and statistics about its execution.
+    *
+    */
+    //TODO USE Symfony Progress Bar: http://symfony.com/doc/current/components/console/helpers/progressbar.html
+    protected function showProgressEstimateDuration($time_started, $processed, $total)
+    {
+        $now         = microtime(true);
+        $origin      = $time_started;
+        $elapsed_sec = (float) ($now - $origin);
+        $eta_sec     = ($total * $elapsed_sec) / $processed;
+        $eta_min     = $eta_sec / 60;
+        $elapsed_min = $elapsed_sec / 60;
+        $processed_min = (integer) ($processed / $elapsed_min);
+        echo "\nTerena entry " . $processed . " / " . $total . "\n";
+        echo "Elapsed time: " . sprintf('%.2F', $elapsed_min) .
+        " minutes - estimated: " . sprintf('%.2F', $eta_min) .
+        " minutes. Speed: " . $processed_min . " terenas / minute.\n";
     }
 }
