@@ -53,8 +53,8 @@ class FeedSyncClientService
     * Returns a feed page from the feedUrl using curl
     * Throws exception if Request gives an error.
     */
-    protected function getFeedPage($page){
-        $url = sprintf("%s%s%s", $this->feedUrl, '?q=*&',  http_build_query(array('page' => $page), '', '&'));
+    protected function getFeedPage($page, $pageSize=1000){
+        $url = sprintf("%s%s%s", $this->feedUrl, '?', http_build_query(array('q' => '*', 'page_size' => $pageSize, 'page' => $page), '', '&'));
         //SOLO UPV
         //$url = sprintf("%s%s%s", $this->feedUrl, '?set=UPV&',  http_build_query(array('page' => $page), '', '&'));
         $ch = curl_init($url);
