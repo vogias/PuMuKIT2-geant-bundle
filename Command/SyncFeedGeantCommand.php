@@ -34,7 +34,13 @@ class SyncFeedGeantCommand extends ContainerAwareCommand
                 'P',
                 InputOption::VALUE_REQUIRED,
                 'If set, the task will import elements from a particular provider only.'
-            );
+            )
+        ->addOption(
+                'show-progress-bar',
+                'b',
+                InputOption::VALUE_NONE,
+                'If set, the task will output a symfony style progress bar.'
+            )    ;
     }
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -47,7 +53,8 @@ class SyncFeedGeantCommand extends ContainerAwareCommand
         $optWall = $input->getOption('Wall')?true:false;
         $limit = $input->getOption('limit')?:0;
         $provider = $input->getOption('provider');
-        $feedSyncService->sync($limit, $optWall, $provider);
+        $show_bar = $input->getOption('show-progress-bar')?true:false;
+        $feedSyncService->sync($output, $limit, $optWall, $provider, $show_bar);
         //SHUTDOWN HAPPILY
     }
 

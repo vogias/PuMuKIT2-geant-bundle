@@ -13,7 +13,7 @@ use Pumukit\SchemaBundle\Services\FactoryService;
 use Pumukit\SchemaBundle\Services\TagService;
 use Pumukit\SchemaBundle\Services\PersonService;
 use Pumukit\SchemaBundle\Services\MultimediaObjectPicService;
-
+use Symfony\Component\Console\Helper\ProgressBar;
 
 /**
 *  Service that iterates over the FeedSyncClientService responses, it processes them using the FeedProcesserService and then inserts/updates the object into the database.
@@ -76,7 +76,7 @@ class FeedSyncService
         $this->optWall=false;
     }
 
-    public function sync($limit = 0, $optWall = false, $provider = null)
+    public function sync($output, $limit = 0, $optWall = false, $provider = null, $setProgressBar = false)
     {
         $this->optWall = $optWall;
         $time_started = microtime(true);
@@ -85,37 +85,62 @@ class FeedSyncService
         if($limit == 0 || $limit > $total){
             $limit = $total;
         }
-        echo "Syncing with Geant Feed...";
+        $progressBar = null;
+        if($setProgressBar){
+            $progressBar = new ProgressBar($output, $total);
+            $progressBar->setFormat("<comment>%message%</comment>\n%current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%");
+            $progressBar->setMessage(' Syncing with Geant Feed...');
+            $progressBar->start();
+        }
         $terenaGenerator = $this->feedClientService->getFeed( $limit, $provider );
         foreach( $terenaGenerator as $terena) {
             $count++;
+            if($count % 10 == 0) {
+                $this->showProgressEstimateDuration ($time_started, $count, $total, $progressBar);
+            }
             if($count > $limit) {
                 break;
             }
             try {
                 $parsedTerena = $this->feedProcesserService->process( $terena );
             } catch (\Exception $e) {
-                //Log exception error.
-                echo sprintf("\nPARSING GENERATOR EXCEPTION: \n-Message: %s \n",$e->getMessage());
+                if(isset($progressBar)) {
+                    //Log exception error.
+                    $progressBar->clear();
+                    echo sprintf("\nPARSING GENERATOR EXCEPTION: -Message: %s \n",$e->getMessage());
+                    echo "\n";
+                    $progressBar->display();
+                }
+                else {
+                    echo sprintf("\nPARSING GENERATOR EXCEPTION: -Message: %s \n",$e->getMessage());
+                }
                 continue;
             }
             try {
                 $this->syncMmobj($parsedTerena);
             }
             catch (\Exception $e) {
-                echo sprintf("\nSYNC GENERATOR EXCEPTION: \n-Message: %s \n----",$e->getMessage());
+                if(isset($progressBar)) {
+                    $progressBar->clear();
+                    echo sprintf("\nSYNC GENERATOR EXCEPTION: \n-Message: %s \n----",$e->getMessage());
+                    echo "\n";
+                    $progressBar->display();
+                }
+                else {
+                    echo sprintf("\nSYNC GENERATOR EXCEPTION: \n-Message: %s \n----",$e->getMessage());
+                }
                 continue;
             }
             if($count % 50 == 0) {
                 $this->dm->flush();
                 $this->dm->clear();
             }
-            if($count % 10 == 0) {
-                $this->showProgressEstimateDuration ($time_started, $count, $total);
-            }
         }
         $this->dm->flush();
         $this->dm->clear();
+        if(isset($progressBar)) {
+            $progressBar->finish();
+        }
 
     }
 
@@ -297,7 +322,7 @@ class FeedSyncService
     *
     */
     //TODO USE Symfony Progress Bar: http://symfony.com/doc/current/components/console/helpers/progressbar.html
-    protected function showProgressEstimateDuration($time_started, $processed, $total)
+    protected function showProgressEstimateDuration($time_started, $processed, $total, $progressBar = null)
     {
         $now         = microtime(true);
         $origin      = $time_started;
@@ -306,9 +331,14 @@ class FeedSyncService
         $eta_min     = $eta_sec / 60;
         $elapsed_min = $elapsed_sec / 60;
         $processed_min = (integer) ($processed / $elapsed_min);
-        echo "\nTerena entry " . $processed . " / " . $total . "\n";
-        echo "Elapsed time: " . sprintf('%.2F', $elapsed_min) .
-        " minutes - estimated: " . sprintf('%.2F', $eta_min) .
-        " minutes. Speed: " . $processed_min . " terenas / minute.\n";
+        if(isset($progressBar)){
+            $progressBar->setProgress($processed);
+        }
+        else {
+            echo "\nTerena entry " . $processed . " / " . $total . "\n";
+            echo "Elapsed time: " . sprintf('%.2F', $elapsed_min) .
+            " minutes - estimated: " . sprintf('%.2F', $eta_min) .
+            " minutes. Speed: " . $processed_min . " terenas / minute.\n";
+        }
     }
 }
