@@ -60,5 +60,5 @@ $ php app/console assets:install
 
 The following command is provided to sync the Géant Feed with PuMuKIT 2 database. It can be executed manually or using a cron.
 ```bash
-php app/console geant:syncfeed:import
+php app/console --env=prod geant:syncfeed:import
 ```
