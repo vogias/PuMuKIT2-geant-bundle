@@ -53,7 +53,7 @@ class FeedSyncClientService
     * Returns a feed page from the feedUrl using curl
     * Throws exception if Request gives an error.
     */
-    protected function getFeedPage($page, $pageSize=10){
+    protected function getFeedPage($page, $pageSize=100){
         $url = sprintf("%s%s%s", $this->feedUrl, '?', http_build_query(array('q' => '*', 'page_size' => $pageSize, 'page' => $page), '', '&'));
         //SOLO UPV
         //$url = sprintf("%s%s%s", $this->feedUrl, '?set=UPV&',  http_build_query(array('page' => $page), '', '&'));
@@ -88,7 +88,7 @@ class FeedSyncClientService
         $eta_min     = $eta_sec / 60;
         $elapsed_min = $elapsed_sec / 60;
         $processed_min = (integer) ($processed / $elapsed_min);
-        echo "Terena entry " . $processed . " / " . $total . "\n";
+        echo "\nTerena entry " . $processed . " / " . $total . "\n";
         echo "Elapsed time: " . sprintf('%.2F', $elapsed_min) .
         " minutes - estimated: " . sprintf('%.2F', $eta_min) .
         " minutes. Speed: " . $processed_min . " terenas / minute.\n";
