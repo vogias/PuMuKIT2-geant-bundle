@@ -37,11 +37,28 @@ $ cd /path/to/pumukit2/
 $ php app/console pumukit:install:bundle Pumukit/Geant/WebTVBundle/PumukitGeantWebTVBundle
 ```
 
-### Step 4: Update assets
+### Step 4: Install the Podcast bundle.
+
+For this bundle to work propertly it's necessary to also install the Podcast bundle:
+```bash
+$ php app/console pumukit:install:bundle Pumukit/PodcastBundle/PumukitPodcastBundle
+```
+
+
+### Step 5: Update assets
 
 ```bash
 $ cd /path/to/pumukit2/
 $ php app/console cache:clear
 $ php app/console cache:clear --env=prod
 $ php app/console assets:install
+```
+
+## Other
+
+### Feed Sync command
+
+The following command is provided to sync the Géant Feed with PuMuKIT 2 database. It can be executed manually or using a cron.
+```bash
+php app/console geant:syncfeed:import
 ```
