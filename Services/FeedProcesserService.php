@@ -23,7 +23,7 @@ class FeedProcesserService
     {
         $processedObject = array();
         if(empty($geantFeedObject['expressions'])) {
-            throw new \Exception(sprintf('ERROR: The Geant Feed with ID: %s  does not have a playable resource.',$geantFeedObject['identifier']));
+            throw new FeedSyncException(sprintf('ERROR: The Geant Feed with ID: %s  does not have a playable resource.',$geantFeedObject['identifier']));
         }
         $processedObject['lastSyncDate'] = new \DateTime();
         $processedObject['provider'] = $geantFeedObject['set'];
@@ -66,7 +66,7 @@ class FeedProcesserService
     public function retrieveLanguage($geantFeedObject)
     {
         if(!isset($geantFeedObject['expressions']['language'])) {
-            throw new \Exception(sprintf('There is no language (expressions.language) on feed with ID: %', $geantFeedObject['identifier']));
+            throw new FeedSyncException(sprintf('There is no language (expressions.language) on feed with ID: %', $geantFeedObject['identifier']));
         }
         $lang = $geantFeedObject['expressions']['language'];
         $lang = substr($lang,-2,2);
@@ -88,7 +88,7 @@ class FeedProcesserService
                 }
             }
         }
-        throw new \Exception(sprintf('There is no languageBlocks.*.title on feed with ID: %s',$geantFeedObject['identifier']));
+        throw new FeedSyncException(sprintf('There is no languageBlocks.*.title on feed with ID: %s',$geantFeedObject['identifier']));
     }
 
     public function retrieveDescription($geantFeedObject, $lang)

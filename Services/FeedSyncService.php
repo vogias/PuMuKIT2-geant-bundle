@@ -71,7 +71,7 @@ class FeedSyncService
         }
         $this->webTVTag = $this->tagRepo->findOneByCod('PUCHWEBTV');
         if(!isset($this->webTVTag)) {
-            throw new \Exception('Tag: PUCHWEBTV does not exists. Did you initialize the repository? (pumukit:init:repo)');
+            throw new FeedSyncException('Tag: PUCHWEBTV does not exists. Did you initialize the repository? (pumukit:init:repo)');
         }
         $this->optWall=false;
     }
@@ -103,7 +103,7 @@ class FeedSyncService
             }
             try {
                 $parsedTerena = $this->feedProcesserService->process( $terena );
-            } catch (\Exception $e) {
+            } catch (FeedSyncException $e) {
                 if(isset($progressBar)) {
                     //Log exception error.
                     $progressBar->clear();
@@ -119,7 +119,7 @@ class FeedSyncService
             try {
                 $this->syncMmobj($parsedTerena);
             }
-            catch (\Exception $e) {
+            catch (FeedSyncException $e) {
                 if(isset($progressBar)) {
                     $progressBar->clear();
                     echo sprintf("\nSYNC GENERATOR EXCEPTION: \n-Message: %s \n----",$e->getMessage());
@@ -243,7 +243,7 @@ class FeedSyncService
                 foreach($mappedItunesTags as $itunesTag) {
                     $iTag = $this->tagRepo->findOneByCod($itunesTag);
                     if(!isset($iTag)) {
-                        throw new \Exception(sprintf('Error! The parsed iTunes tag with code: %s  doesnt exists on PuMuKIT. Did you initialize the iTunes repo?' ,$itunesTag));
+                        throw new FeedSyncException(sprintf('Error! The parsed iTunes tag with code: %s  doesnt exists on PuMuKIT. Did you initialize the iTunes repo?' ,$itunesTag));
                     }
                     $this->tagService->addTagToMultimediaObject($mmobj, $iTag->getId(), false);
                 }
