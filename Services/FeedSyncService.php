@@ -299,7 +299,7 @@ class FeedSyncService
             $mmobj->setProperty('iframeable', true);
             $mmobj->setProperty('iframe_url', $url);
         }
-        $track->setOnlyAudio('false');
+        $track->setOnlyAudio(false);
         $this->dm->persist($track);
         $track->addTag('geant_track');
     }
