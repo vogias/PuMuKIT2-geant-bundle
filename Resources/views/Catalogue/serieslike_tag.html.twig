@@ -17,7 +17,7 @@
                 <a href="{{ path_to_tag(tag.cod) }}">
                     {{tag.title | default('No title')|trans}}
                 </a>
-                <a href="">
+                <a href="{{ path('pumukit_webtv_categories_index', {'provider': tag.cod })}}">
                     <span class="glyphicon glyphicon-share"></span>
                 </a>
             </div>
