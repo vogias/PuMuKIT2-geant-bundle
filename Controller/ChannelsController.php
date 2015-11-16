@@ -12,7 +12,7 @@ use Pumukit\SchemaBundle\Document\Series;
 use Pumukit\SchemaBundle\Document\MultimediaObject;
 use Pumukit\SchemaBundle\Document\Tag;
 
-class CategoriesController extends Controller
+class ChannelsController extends Controller
 {
     private $categories = array(
       1 => array('title' => 'Health and Medicine', 'map' => array('103')),
@@ -33,7 +33,7 @@ class CategoriesController extends Controller
         }
 
         $title = $this->categories[$category]['title'];
-        $this->get('pumukit_web_tv.breadcrumbs')->addList($title, 'pumukit_geant_webtv_categories_multimediaobjects', array('category' => $category));
+        $this->get('pumukit_web_tv.breadcrumbs')->addList($title, 'pumukit_geant_webtv_channels_multimediaobjects', array('category' => $category));
 
         
         // --- Get Tag Parent for Tag Fields ---
@@ -47,6 +47,7 @@ class CategoriesController extends Controller
         $durationFound = $request->query->get('duration');
         $startFound = $request->query->get('start');
         $endFound = $request->query->get('end');
+        $yearFound = $request->query->get('year');
         $languageFound = $request->query->get('language');
         // --- END Get Variables --
         // --- Create QueryBuilder ---
@@ -58,7 +59,7 @@ class CategoriesController extends Controller
         $queryBuilder = $this->searchQueryBuilder($queryBuilder, $searchFound);
         $queryBuilder = $this->typeQueryBuilder($queryBuilder, $typeFound);
         $queryBuilder = $this->durationQueryBuilder($queryBuilder, $durationFound);
-        $queryBuilder = $this->dateQueryBuilder($queryBuilder, $startFound, $endFound);
+        $queryBuilder = $this->dateQueryBuilder($queryBuilder, $startFound, $endFound, $yearFound);
         $queryBuilder = $this->languageQueryBuilder($queryBuilder, $languageFound);
         $queryBuilder = $this->tagsQueryBuilder($queryBuilder, $tagsFound);
         // --- END Create QueryBuilder ---
@@ -79,6 +80,22 @@ class CategoriesController extends Controller
         $tag = new Tag();
         $tag->setCod($this->categories[$category]['map'][0]);
         $tag->setTitle($title);
+        /* Added search years for Geant search.*/
+        // --- Query to get oldest date ---
+        $firstMmobj = $this->get('doctrine_mongodb')
+        ->getRepository('PumukitSchemaBundle:MultimediaObject')
+        ->createStandardQueryBuilder()->sort('record_date','asc')->limit(1)
+        ->getQuery()->getSingleResult();
+        $minRecordDate = $firstMmobj->getRecordDate()->format('m/d/Y');
+        $maxRecordDate = date('m/d/Y');
+        // --- Query to get years for the 'Year' select form. ---
+        $searchYears = array();
+        $maxYear = date('Y');
+        $tempYear = $firstMmobj->getRecordDate()->format('Y');
+        while($tempYear <= $maxYear) {
+            $searchYears[] = $tempYear;
+            $tempYear++;
+        }
 
         // --- RETURN ---
         return array('type' => 'multimediaObject',
@@ -89,6 +106,7 @@ class CategoriesController extends Controller
             'number_cols' => $numberCols,
             'languages' => $searchLanguages,
             'blocked_tag' => $tag,
+            'search_years' => $searchYears,
         );
     }
 
@@ -131,7 +149,7 @@ class CategoriesController extends Controller
 
     private function typeQueryBuilder($queryBuilder, $typeFound)
     {
-        if ($typeFound != '') {
+        if ($typeFound) {
             $queryBuilder->field('tracks.only_audio')->equals($typeFound == 'Audio');
         }
 
@@ -161,15 +179,23 @@ class CategoriesController extends Controller
         return $queryBuilder;
     }
 
-    private function dateQueryBuilder($queryBuilder, $startFound, $endFound)
+    private function dateQueryBuilder($queryBuilder, $startFound, $endFound, $yearFound=null)
     {
-        if ($startFound != '') {
-            $start = \DateTime::createFromFormat('d/m/Y', $startFound);
-            $queryBuilder->field('record_date')->gt($start);
-        }
-        if ($endFound != '') {
-            $end = \DateTime::createFromFormat('d/m/Y', $endFound);
+        if ($yearFound) {
+            $start = \DateTime::createFromFormat('d/m/Y:H:i:s', sprintf('01/01/%s:00:00:01',$yearFound));
+            $end = \DateTime::createFromFormat('d/m/Y:H:i:s', sprintf('01/01/%s:00:00:01',($yearFound)+1));
+            $queryBuilder->field('record_date')->gte($start);
             $queryBuilder->field('record_date')->lt($end);
+        }
+        else {
+            if ($startFound) {
+                $start = \DateTime::createFromFormat('d/m/Y', $startFound);
+                $queryBuilder->field('record_date')->gt($start);
+            }
+            if ($endFound) {
+                $end = \DateTime::createFromFormat('d/m/Y', $endFound);
+                $queryBuilder->field('record_date')->lt($end);
+            }
         }
 
         return $queryBuilder;
@@ -177,7 +203,7 @@ class CategoriesController extends Controller
 
     private function languageQueryBuilder($queryBuilder, $languageFound)
     {
-        if ($languageFound != '') {
+        if ($languageFound) {
             $queryBuilder->field('tracks.language')->equals($languageFound);
         }
 
@@ -186,6 +212,10 @@ class CategoriesController extends Controller
 
     private function tagsQueryBuilder($queryBuilder, $tagsFound)
     {
+        if ($tagsFound !== null) {
+            $tagsFound = array_values(array_diff($tagsFound, array('All', '')));
+        }
+
         if (count($tagsFound) > 0) {
             $queryBuilder->field('tags.cod')->all($tagsFound);
         }
