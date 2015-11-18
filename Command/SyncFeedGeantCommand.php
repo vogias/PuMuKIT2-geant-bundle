@@ -36,6 +36,12 @@ class SyncFeedGeantCommand extends ContainerAwareCommand
                 'If set, the task will import elements from a particular provider only.'
             )
         ->addOption(
+                'showids',
+                'S',
+                InputOption::VALUE_NONE,
+                'If set, the task will show more information than usual.'
+            )
+        ->addOption(
                 'show-progress-bar',
                 'b',
                 InputOption::VALUE_NONE,
@@ -53,8 +59,9 @@ class SyncFeedGeantCommand extends ContainerAwareCommand
         $optWall = $input->getOption('Wall')?true:false;
         $limit = $input->getOption('limit')?:0;
         $provider = $input->getOption('provider');
+        $verbose = $input->getOption('showids')?true:false;
         $show_bar = $input->getOption('show-progress-bar')?true:false;
-        $feedSyncService->sync($output, $limit, $optWall, $provider, $show_bar);
+        $feedSyncService->sync($output, $limit, $optWall, $provider, $verbose, $show_bar);
         //SHUTDOWN HAPPILY
     }
 

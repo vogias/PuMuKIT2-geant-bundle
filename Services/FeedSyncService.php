@@ -76,9 +76,10 @@ class FeedSyncService
         $this->optWall=false;
     }
 
-    public function sync($output, $limit = 0, $optWall = false, $provider = null, $setProgressBar = false)
+    public function sync($output, $limit = 0, $optWall = false, $provider = null, $verbose = false, $setProgressBar = false)
     {
         $this->optWall = $optWall;
+        $this->verbose = $verbose;
         $time_started = microtime(true);
         $count = 0;
         $total = $this->feedClientService->getFeedTotal($provider);
@@ -95,6 +96,9 @@ class FeedSyncService
         $terenaGenerator = $this->feedClientService->getFeed( $limit, $provider );
         foreach( $terenaGenerator as $terena) {
             $count++;
+            if($verbose) {
+                echo sprintf("\nImporting object: id: %s\n",$terena['identifier']);
+            }
             if($count % 10 == 0) {
                 $this->showProgressEstimateDuration ($time_started, $count, $total, $progressBar);
             }
