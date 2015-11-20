@@ -29,9 +29,6 @@
     <!-- Search -->
     <a href="{{ path('pumukit_webtv_search_multimediaobjects')}}" class="{{menu_selected=="pumukit_webtv_search_multimediaobjects"?'selected':''}}">{% trans %} Go to Advanced Search {% endtrans %}</a>
 
-
-
-
     {#<!-- Mediateca -->
     <!--<a href="{{ path('pumukit_webtv_medialibrary_index') }}" class="{{menu_selected=="pumukit_webtv_medialibrary_index"?'selected':''}}">{% trans %} Full catalogue {% endtrans %}</a>-->
     <!-- Live Channels -->
@@ -43,7 +40,8 @@
 
   </ul>
 </div>
-
+{% if menu_stats %}
 <div class="row widget slidebar stats">
   {% render(controller('PumukitWebTVBundle:Widget:stats')) %}
 </div>
+{% endif %}
