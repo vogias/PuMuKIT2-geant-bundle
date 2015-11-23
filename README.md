@@ -42,11 +42,12 @@ Install the bundle by executing the following line command. This command updates
 $ php app/console pumukit:install:bundle Pumukit/Geant/WebTVBundle/PumukitGeantWebTVBundle
 ```
 
-### Step 4: Install the Podcast bundle.
+### Step 4: Install the Podcast bundle and initialize iTunesU tags.
 
 For this bundle to work propertly it's necessary to also install the Podcast bundle:
 ```bash
 $ php app/console pumukit:install:bundle Pumukit/PodcastBundle/PumukitPodcastBundle
+$ php app/console podcast:init:tags --force
 ```
 
 
