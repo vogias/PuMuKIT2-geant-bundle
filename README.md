@@ -1,5 +1,7 @@
 # GEANT-OER Project: GeantWebTVBundle
 
+Bundle based on Symfony to work with the PuMuKIT2 Video Platform.
+
 This bundle overrides the [PuMuKIT-2 WebTV Bundle](https://github.com/campusdomar/PuMuKIT2/tree/master/src/Pumukit/WebTVBundle). It has been developed as the Web portal for the Geant-OER project, whose goal is the creation of an European repository of educational multimedia resources for learning.
 
 Installation
