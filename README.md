@@ -1,4 +1,10 @@
-# GEANT WebTVBundle (GEANT)
+# GEANT-OER Project: GeantWebTVBundle
+
+OBJETIVO
+Este bundle modifica el WebTV bundle base y ha sido desarrollado para crear el portal Web del proyecto Geant-OER. Este proyecto consiste en la creación de un repositorio Europeo de objetos audiovisuales de aprendizaje. El portal de este proyecto está basado en PuMuKIT-2
+
+This bundle overrides the [PuMuKIT-2 WebTV Bundle](https://github.com/campusdomar/PuMuKIT2/tree/master/src/Pumukit/WebTVBundle). It has been developed as the Web portal for the Geant-OER project, whose goal is the creation of an European repository of educational multimedia resources for learning.
+
 Installation
 ------------
 
@@ -13,7 +19,8 @@ Open a command console, enter your project directory and execute the
 following command to add this repo:
 
 ```bash
-$ composer config repositories.pumukitgeantwebtvbundle vcs http://gitlab.teltek.es/pumukit2/pumukitgeantwebtvbundle.git
+$ composer config repositories.pumukitgeantwebtvbundle vcs
+https://github.com/teltek/PuMuKIT2-geant-bundle.git
 ```
 
 
@@ -33,7 +40,6 @@ Install the bundle by executing the following line command. This command updates
 .
 
 ```bash
-$ cd /path/to/pumukit2/
 $ php app/console pumukit:install:bundle Pumukit/Geant/WebTVBundle/PumukitGeantWebTVBundle
 ```
 
@@ -48,7 +54,6 @@ $ php app/console pumukit:install:bundle Pumukit/PodcastBundle/PumukitPodcastBun
 ### Step 5: Update assets
 
 ```bash
-$ cd /path/to/pumukit2/
 $ php app/console cache:clear
 $ php app/console cache:clear --env=prod
 $ php app/console assets:install
