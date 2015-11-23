@@ -1,8 +1,5 @@
 # GEANT-OER Project: GeantWebTVBundle
 
-OBJETIVO
-Este bundle modifica el WebTV bundle base y ha sido desarrollado para crear el portal Web del proyecto Geant-OER. Este proyecto consiste en la creación de un repositorio Europeo de objetos audiovisuales de aprendizaje. El portal de este proyecto está basado en PuMuKIT-2
-
 This bundle overrides the [PuMuKIT-2 WebTV Bundle](https://github.com/campusdomar/PuMuKIT2/tree/master/src/Pumukit/WebTVBundle). It has been developed as the Web portal for the Geant-OER project, whose goal is the creation of an European repository of educational multimedia resources for learning.
 
 Installation
