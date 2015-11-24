@@ -1,5 +1,10 @@
 <?php
+
 namespace Pumukit\Geant\WebTVBundle\Services;
+
+use Symfony\Component\Intl\Intl;
+
+
 /**
 *  Service that processes the returned JSON from FeedSyncClientService into an object that can be read by the FeedSyncService.
 *
@@ -66,10 +71,17 @@ class FeedProcesserService
     public function retrieveLanguage($geantFeedObject)
     {
         if(!isset($geantFeedObject['expressions']['language'])) {
-            throw new FeedSyncException(sprintf('There is no language (expressions.language) on feed with ID: %', $geantFeedObject['identifier']));
+            throw new FeedSyncException(sprintf('There is no language (expressions.language) on feed with ID: %s', $geantFeedObject['identifier']));
         }
         $lang = $geantFeedObject['expressions']['language'];
         $lang = substr($lang,-2,2);
+        $lang = strtolower($lang);
+        $languageNames = Intl::getLanguageBundle()->getLanguageNames();
+
+        if(!array_key_exists($lang, $languageNames)) {
+            throw new FeedSyncException(sprintf('The feed with ID: %s has a language format that is not recognized: %s', $geantFeedObject['identifier'], $geantFeedObject['expressions']['language'])); 
+        }
+
         return $lang;
     }
 
