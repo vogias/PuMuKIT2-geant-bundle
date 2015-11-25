@@ -11,6 +11,7 @@ class MultimediaObjectController extends ParentController
     public function preExecute(MultimediaObject $multimediaObject, Request $request)
     {
         if ($multimediaObject->getProperty('iframeable') === true ) {
+            $this->dispatchViewEvent($multimediaObject);
             return $this->forward('PumukitGeantWebTVBundle:Iframe:index', array('request' => $request, 'multimediaObject' => $multimediaObject));
         }
     }
