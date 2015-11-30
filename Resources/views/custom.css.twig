@@ -64,6 +64,7 @@ h1.title-for-crumbs{
 .header-content{
     padding-top:10px;
 }
+
 footer{
     max-width: {{content_max_width}};
     margin: 0 auto;
@@ -167,9 +168,6 @@ abbr[title]  {
     height: 99px;
     top: 2px;
     left: 2px;
-}
-.video-duration {
-    display: none;
 }
 
 .date.mmobj {
@@ -363,5 +361,21 @@ a:hover .cover {
     .mmobj-numviewed {
         display: none;
     }
+}
+.powered_by-wrapper {
+
+}
+.powered_by a {
+    color: white;
+}
+
+.video-duration {
+    bottom: initial;
+    right: initial;
+    top: 8%;
+    left: 8%;
+    position: absolute;
+    background:rgba(0,0,0,0.65);
+    padding: 1px 3px;
 }
 {% endblock %}
