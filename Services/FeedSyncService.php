@@ -16,9 +16,9 @@ use Pumukit\SchemaBundle\Services\MultimediaObjectPicService;
 use Symfony\Component\Console\Helper\ProgressBar;
 
 /**
-*  Service that iterates over the FeedSyncClientService responses, it processes them using the FeedProcesserService and then inserts/updates the object into the database.
-*
-*/
+ *  Service that iterates over the FeedSyncClientService responses, it processes them using the FeedProcesserService and then inserts/updates the object into the database.
+ *
+ */
 class FeedSyncService
 {
     private $factoryService;
@@ -37,8 +37,13 @@ class FeedSyncService
     private $webTVTag;
     private $optWall; //If true, prints warnings.
 
+    private $VIDEO_EXTENSIONS = array('mp4', 'm4v', 'm4b', 'wmv', 'avi');
+    private $AUDIO_EXTENSIONS = array('mp3', 'm4a', 'wav', 'wma', 'ogg');
+
+
+
     public function __construct(FactoryService $factoryService, TagService $tagService, PersonService $personService, MultimediaObjectPicService $mmsPicService, FeedSyncClientService $feedClientService,
-    FeedProcesserService $feedProcesserService,  DocumentManager $dm)
+                                FeedProcesserService $feedProcesserService,  DocumentManager $dm)
     {
         //Schema Services
         $this->factoryService = $factoryService;
@@ -152,18 +157,18 @@ class FeedSyncService
     {
         $factory = $this->factoryService;
         $mmobj = $this->mmobjRepo->createQueryBuilder()
-        ->field('properties.geant_id')
-        ->equals($parsedTerena['identifier'])
-        ->getQuery()
-        ->getSingleResult();
+                      ->field('properties.geant_id')
+                      ->equals($parsedTerena['identifier'])
+                      ->getQuery()
+                      ->getSingleResult();
         //We assume the 'provider' property of a feed won't change for the same Geant Feed Resource.
         //If it changes, the mmobj would keep it's original provider.
         if(!isset($mmobj)) {
             $series = $this->seriesRepo->createQueryBuilder()
-            ->field('properties.geant_provider')
-            ->equals($parsedTerena['provider'])
-            ->getQuery()
-            ->getSingleResult();
+                           ->field('properties.geant_provider')
+                           ->equals($parsedTerena['provider'])
+                           ->getQuery()
+                           ->getSingleResult();
             if(!isset($series)) {
                 $series = $factory->createSeries();
                 $series->setProperty('geant_provider',$parsedTerena['provider']);
@@ -229,10 +234,10 @@ class FeedSyncService
             $tag = $this->tagRepo->findOneByCod($parsedTag);//First we search by code on the database (it should be iTunesU, but could be other)
 
             if(!isset($tag))  //Second we search by title on the database (again, it should be iTunesU, but could be other)
-            $tag = $this->tagRepo->findOneByTitle($parsedTag);
+                $tag = $this->tagRepo->findOneByTitle($parsedTag);
 
             if(!isset($tag))  //Now we start getting tricky. We search the cod, but adding 'U' (It should be UNESCO)
-            $tag = $this->tagRepo->findOneByCod(sprintf('U%s',$parsedTag));
+                $tag = $this->tagRepo->findOneByCod(sprintf('U%s',$parsedTag));
 
             if(!isset($tag)) { //If we can't find it here, all hope is lost. We log it and continue.
                 if($this->optWall){
@@ -268,7 +273,7 @@ class FeedSyncService
 
             $role = $this->roleRepo->findOneByCod($contributor['role']);
             if(!isset($role))  //Workaround for PuMuKIT. The 'Cod' field is not consistent, some are lowercase, some are ucfirst
-            $role = $this->roleRepo->findOneByCod(ucfirst($contributor['role']));
+                $role = $this->roleRepo->findOneByCod(ucfirst($contributor['role']));
 
             if(!isset($role)) { //If the role doesn't exist, use 'Participant'.
                 $role = $this->roleRepo->findOneByCod('Participant'); // <-- This cod is ucfirst, but others are lowercase.
@@ -282,7 +287,6 @@ class FeedSyncService
     {
         $url = $parsedTerena['track_url'];
         $urlExtension = pathinfo((parse_url($parsedTerena['track_url'])['path']), PATHINFO_EXTENSION);
-
         $track = $mmobj->getTrackWithTag('geant_track');
         if(!isset($track)) {
             $track = new Track();
@@ -295,15 +299,21 @@ class FeedSyncService
         $track->setPath($url);
         $track->setUrl($url);
 
-        if( $urlExtension == 'mp4' || $urlExtension == 'mp3' ) {
+        $format = explode('/', $parsedTerena['track_format']);
+
+        if( $format[0] == 'video' || in_array($urlExtension, $this->VIDEO_EXTENSIONS)) {
             $track->addTag('display');
+            $track->setOnlyAudio(false);
+        }
+        else if( $format[0] == 'audio' || in_array($urlExtension, $this->AUDIO_EXTENSIONS)) {
+            $track->addTag('display');
+            $track->setOnlyAudio(true);
         }
         else {
             $mmobj->setProperty('opencast', true); //Workaround to prevent editing the Schema Filter for now.
             $mmobj->setProperty('iframeable', true);
             $mmobj->setProperty('iframe_url', $url);
         }
-        $track->setOnlyAudio(false);
         $this->dm->persist($track);
         $track->addTag('geant_track');
     }
@@ -322,9 +332,9 @@ class FeedSyncService
     }
 
     /**
-    * Prints on screen an estimated duration of the script and statistics about its execution.
-    *
-    */
+     * Prints on screen an estimated duration of the script and statistics about its execution.
+     *
+     */
     //TODO USE Symfony Progress Bar: http://symfony.com/doc/current/components/console/helpers/progressbar.html
     protected function showProgressEstimateDuration($time_started, $processed, $total, $progressBar = null)
     {
@@ -341,8 +351,8 @@ class FeedSyncService
         else {
             echo "\nTerena entry " . $processed . " / " . $total . "\n";
             echo "Elapsed time: " . sprintf('%.2F', $elapsed_min) .
-            " minutes - estimated: " . sprintf('%.2F', $eta_min) .
-            " minutes. Speed: " . $processed_min . " terenas / minute.\n";
+                 " minutes - estimated: " . sprintf('%.2F', $eta_min) .
+                 " minutes. Speed: " . $processed_min . " terenas / minute.\n";
         }
     }
 }

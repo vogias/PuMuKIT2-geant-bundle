@@ -10,8 +10,8 @@ if [ -z $webroot ]
 else
   if [ -z $pwd ]
     then
-      php ../app/console geant:syncfeed:import --env=prod
-      php ../app/console cache:clear --env=prod
+      php app/console geant:syncfeed:import --env=prod
+      php app/console cache:clear --env=prod
   else
       php ../../../../../../app/console geant:syncfeed:import --env=prod
       php ../../../../../../app/console cache:clear --env=prod
