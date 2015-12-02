@@ -63,7 +63,7 @@ $ php app/console assets:install
 
 ### Feed Sync script
 
-The following script is provided to sync the Géant Feed with PuMuKIT 2 database. It can be executed manually or using a cron. You need to specify the environment's URL to the script.
+Execute the following script from the root folder of your PuMuKIT2 proyect (usually, /var/www/pumukit2) specifying the environment's URL to sync the Géant Feed with PuMuKIT 2 database. It can be executed manually or using a cron task.
 ```bash
 $ ./bin/geant_syncfeed_import https://example.com
 ```
