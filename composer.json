@@ -26,5 +26,6 @@
         "psr-4": {
             "Pumukit\\Geant\\WebTVBundle\\": ""
         }
-    }
+    },
+    "bin": ["Resources/data/bin/geant_syncfeed_import"]
 }
