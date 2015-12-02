@@ -1,0 +1,31 @@
+#!/bin/bash
+
+webroot=$1
+pwd=$(pwd|grep Resources)
+
+if [ -z $webroot ]
+  then
+    echo "This script imports all the new feeds and reloads the environment cache."
+    echo "Usage: geant_syncfeed_import https://example.com"
+else
+  if [ -z $pwd ]
+    then
+      php ../app/console geant:syncfeed:import --env=prod
+      php ../app/console cache:clear --env=prod
+  else
+      php ../../../../../../app/console geant:syncfeed:import --env=prod
+      php ../../../../../../app/console cache:clear --env=prod
+  fi
+  wget -q -O /dev/null "$webroot/category/2" > /dev/null 2>&1
+  wget -q -O /dev/null "$webroot/category/3" > /dev/null 2>&1
+  wget -q -O /dev/null "$webroot/category/4" > /dev/null 2>&1
+  wget -q -O /dev/null "$webroot/category/5" > /dev/null 2>&1
+  wget -q -O /dev/null "$webroot/latestuploads" > /dev/null 2>&1
+  wget -q -O /dev/null "$webroot/catalog/by_repository" > /dev/null 2>&1
+  wget -q -O /dev/null "$webroot/categories" > /dev/null 2>&1
+  wget -q -O /dev/null "$webroot/info" > /dev/null 2>&1
+  wget -q -O /dev/null "$webroot/faq" > /dev/null 2>&1
+  wget -q -O /dev/null "$webroot/contact" > /dev/null 2>&1
+  wget -q -O /dev/null "$webroot/about" > /dev/null 2>&1
+  wget -q -O /dev/null "$webroot/searchmultimediaobjects" > /dev/null 2>&1
+fi
