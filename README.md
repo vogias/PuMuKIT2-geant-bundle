@@ -18,8 +18,7 @@ Open a command console, enter your project directory and execute the
 following command to add this repo:
 
 ```bash
-$ composer config repositories.pumukitgeantwebtvbundle vcs
-https://github.com/teltek/PuMuKIT2-geant-bundle.git
+$ composer config repositories.pumukitgeantwebtvbundle vcs https://github.com/teltek/PuMuKIT2-geant-bundle.git
 ```
 
 

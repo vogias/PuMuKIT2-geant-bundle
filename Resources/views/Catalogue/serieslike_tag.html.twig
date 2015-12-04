@@ -1,6 +1,6 @@
 {% set col_mapper = {'1': 'col-md-12', '2': 'col-md-6', '3': 'col-md-4', '4': 'col-md-3'} %}
 {% set col_class = ( col_mapper[cols|default('1')] | default(col_mapper['1'] ) ) %}
-<div class="{{ col_class }}">
+<div class="{{ col_class }} nopadding">
     <div class="pumukit_mmobj">
         <a href="{{ path_to_tag(tag.cod) }}">
             <figure class="pumukit_album">
@@ -12,7 +12,7 @@
                 </span>
             </figure>
         </a>
-        <div class="info serial">
+        <div class="info serial" style="position: absolute; left: 137px;">
             <div class="title tagcatalogue">
                 <a href="{{ path_to_tag(tag.cod) }}">
                     {{tag.title | default('No title')|trans}}
