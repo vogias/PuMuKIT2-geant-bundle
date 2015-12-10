@@ -52,7 +52,7 @@ class FeedSyncService
         $this->mmsPicService = $mmsPicService;
         //Geant Sync Services
         $this->feedClientService = $feedClientService;
-        $this->feedProcesserService = $feedProcesserService;
+        $this->feedProcesser = $feedProcesserService;
         $this->dm = $dm;
         $this->init();
     }
@@ -112,7 +112,7 @@ class FeedSyncService
                 break;
             }
             try {
-                $parsedTerena = $this->feedProcesserService->process( $terena );
+                $parsedTerena = $this->feedProcesser->process( $terena );
             } catch (FeedSyncException $e) {
                 if(isset($progressBar)) {
                     //Log exception error.
@@ -256,7 +256,7 @@ class FeedSyncService
 
             //If the tag turned out to be from UNESCO, we try to add the iTunesU mapped tag
             if($tag->isDescendantOfByCod('UNESCO')) {
-                $mappedItunesTags = $this->feedProcesserService->mapCodeToItunes(sprintf('U%s',substr($parsedTag,0,3)));
+                $mappedItunesTags = $this->feedProcesser->mapCodeToItunes(sprintf('U%s',substr($parsedTag,0,3)));
                 foreach($mappedItunesTags as $itunesTag) {
                     $iTag = $this->tagRepo->findOneByCod($itunesTag);
                     if(!isset($iTag)) {
@@ -317,10 +317,15 @@ class FeedSyncService
             $track->addTag('display');
             $track->setOnlyAudio(true);
         }
-        else {
+        else if ($this->feedProcesser->isYoutubeUrl($url)) {
             $mmobj->setProperty('opencast', true); //Workaround to prevent editing the Schema Filter for now.
             $mmobj->setProperty('iframeable', true);
-            $mmobj->setProperty('iframe_url', $url);
+            $mmobj->setProperty('iframe_url', $this->feedProcesser->getYoutubeEmbedUrl($url));
+        }
+        else {
+            $mmobj->setProperty('opencast', true); //Workaround to prevent editing the Schema Filter for now.
+            $mmobj->setProperty('redirect', true);
+            $mmobj->setProperty('redirect_url', $url);
         }
         $this->dm->persist($track);
         $track->addTag('geant_track');
