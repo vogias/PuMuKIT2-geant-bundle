@@ -232,4 +232,15 @@ class FeedProcesserService
         }
         return $mappedCode;
     }
+
+    public function isYoutubeUrl($url)
+    {
+        return false;
+    }
+
+    public function getYoutubeEmbedUrl($url)
+    {
+        return $url;
+    }
+
 }
