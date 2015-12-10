@@ -13,9 +13,10 @@ class FeedSyncClientService
 {
     private $feedUrl;
 
-    public function __construct($feedUrl)
+    public function __construct($feedUrl, $logPath)
     {
         $this->feedUrl = $feedUrl;
+        $this->logPath = $logPath;
         $this->init();
     }
     public function init()
@@ -115,7 +116,7 @@ class FeedSyncClientService
     function saveCurlToDisk($curlContent, $page)
     {
         $dateStr = (new \DateTime())->format('Y-m-d');
-        $dirLogs  = "app/logs/GEANTFEED/".$dateStr;
+        $dirLogs  = $this->logPath."GEANTFEED/".$dateStr;
         if(!is_dir($dirLogs)) {
             mkdir($dirLogs, 0777, true);
         }
