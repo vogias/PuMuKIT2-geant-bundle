@@ -32,9 +32,9 @@
                     </div>
                     <div class="subtitle">
                         {% if object.subtitle is not empty %}
-                        <abbr title="{{object.subtitle}}">{{object.subtitle}}</abbr>
+                        <div style="overflow:hidden;height:1.2em;text-overflow:ellipsis; width:100%;white-space: nowrap;" title="{{object.subtitle}}">{{object.subtitle}}</div>
                         {% else %}
-                        <abbr title="{{object.series.title}}">{{object.series.title}}</abbr>
+                        <div style="overflow:hidden;height:1.2em;text-overflow:ellipsis; width:100%;white-space: nowrap;" title="{{object.series.title}}">{{object.series.title}}</div>
                         {% endif %}
                     </div>
                     <div class="date mmobj">
