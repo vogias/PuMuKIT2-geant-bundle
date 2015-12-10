@@ -14,5 +14,13 @@ class MultimediaObjectController extends ParentController
             $this->dispatchViewEvent($multimediaObject);
             return $this->forward('PumukitGeantWebTVBundle:Iframe:index', array('request' => $request, 'multimediaObject' => $multimediaObject));
         }
+        else if ($multimediaObject->getProperty('redirect') === true ) {
+            $this->dispatchViewEvent($multimediaObject);
+            $redirectUrl = $multimediaObject->getProperty('redirect_url');
+            if (!$redirectUrl) {
+                throw $this->createNotFoundException();
+            }
+            return $this->redirect($redirectUrl);
+        }
     }
 }
