@@ -7,8 +7,8 @@ use Pumukit\SchemaBundle\Document\MultimediaObject;
 use Pumukit\SchemaBundle\Document\Series;
 
 /**
-*  Service that acts as a client to read the feeds and return a JSON structure with each Geant Feed Object.
-*/
+ *  Service that acts as a client to read the feeds and return a JSON structure with each Geant Feed Object.
+ */
 class FeedSyncClientService
 {
     private $feedUrl;
@@ -24,10 +24,10 @@ class FeedSyncClientService
     }
 
     /** Returns a Generator (iterable object) for 'Terena Objects'
-    * This function's return value can be iterated over as an array of 'Terena Objects'.
-    *
-    * For more information, see: http://php.net/manual/en/language.generators.overview.php
-    */
+     * This function's return value can be iterated over as an array of 'Terena Objects'.
+     *
+     * For more information, see: http://php.net/manual/en/language.generators.overview.php
+     */
     public function getFeed($limit = 0, $provider = null)
     {
         $time_started = microtime(true);
@@ -51,9 +51,9 @@ class FeedSyncClientService
     }
 
     /**
-    * Returns a feed page from the feedUrl using curl
-    * Throws exception if Request gives an error.
-    */
+     * Returns a feed page from the feedUrl using curl
+     * Throws exception if Request gives an error.
+     */
     protected function getFeedPage($page, $pageSize=100, $provider = null){
         if(isset($provider)) {
             $url = sprintf("%s?%s", $this->feedUrl, http_build_query(array('page' => $page,
@@ -62,8 +62,8 @@ class FeedSyncClientService
         }
         else {
             $url = sprintf("%s?%s", $this->feedUrl, http_build_query(array('q' => '*',
-                                                                       'page_size' => $pageSize,
-                                                                       'page' => $page), '', '&'));
+                                                                           'page_size' => $pageSize,
+                                                                           'page' => $page), '', '&'));
         }
         $ch = curl_init($url);
 
@@ -78,14 +78,15 @@ class FeedSyncClientService
             $msg = "HTTP Request Failed. ". $url . "\nHTTP_CODE: " . $sal["status"] ." ". $sal["error"];
             throw new \ErrorException($msg);
         }
+        $this->saveCurlToDisk($sal["content"], $page);
         curl_close($ch);
         return $sal["content"];
     }
 
     /**
-    * Returns total from a feedUrl
-    * Throws exception if Request gives an error.
-    */
+     * Returns total from a feedUrl
+     * Throws exception if Request gives an error.
+     */
     public function getFeedTotal($provider = null){
         if (isset($provider)) {
             $url = sprintf("%s?%s", $this->feedUrl, http_build_query(array('page' => 1, 'page_size' => 0, 'set' => $provider), '', '&'));
@@ -93,8 +94,8 @@ class FeedSyncClientService
         else {
             $url = sprintf("%s?%s", $this->feedUrl, http_build_query(array('q' => '*', 'page_size' => 0, 'page' => 1), '', '&'));
         }
-        $ch = curl_init($url);
 
+        $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HEADER, false);
 
@@ -109,5 +110,15 @@ class FeedSyncClientService
         curl_close($ch);
         $json = json_decode($sal["content"],true);
         return    $total = $json['total'];
+    }
+
+    function saveCurlToDisk($curlContent, $page)
+    {
+        $dateStr = (new \DateTime())->format('Y-m-d');
+        $dirLogs  = "app/logs/GEANTFEED/".$dateStr;
+        if(!is_dir($dirLogs)) {
+            mkdir($dirLogs, 0777, true);
+        }
+        $out = file_put_contents( $dirLogs.'/page'.$page.'.json', $curlContent );
     }
 }
