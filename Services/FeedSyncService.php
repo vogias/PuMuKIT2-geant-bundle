@@ -99,6 +99,7 @@ class FeedSyncService
             $progressBar->start();
         }
         $terenaGenerator = $this->feedClientService->getFeed( $limit, $provider );
+        $lastSyncDate = new \MongoDate();
         foreach( $terenaGenerator as $terena) {
             $count++;
             if($verbose) {
@@ -126,7 +127,7 @@ class FeedSyncService
                 continue;
             }
             try {
-                $this->syncMmobj($parsedTerena);
+                $this->syncMmobj($parsedTerena, $lastSyncDate);
             }
             catch (FeedSyncException $e) {
                 if(isset($progressBar)) {
@@ -153,27 +154,32 @@ class FeedSyncService
 
     }
 
-    public function syncMmobj( $parsedTerena )
+    public function syncMmobj( $parsedTerena , \MongoDate $lastSyncDate = null)
     {
+        if(!isset($lastSyncDate)) {
+            $lastSyncDate = new \MongoDate();
+        }
         $factory = $this->factoryService;
         $mmobj = $this->mmobjRepo->createQueryBuilder()
                       ->field('properties.geant_id')
                       ->equals($parsedTerena['identifier'])
                       ->getQuery()
                       ->getSingleResult();
+
+        $series = $this->seriesRepo->createQueryBuilder()
+                       ->field('properties.geant_provider')
+                       ->equals($parsedTerena['provider'])
+                       ->getQuery()
+                       ->getSingleResult();
+        if(!isset($series)) {
+            $series = $factory->createSeries();
+            $series->setProperty('geant_provider',$parsedTerena['provider']);
+            $series->setTitle($parsedTerena['provider']);
+        }
+
         //We assume the 'provider' property of a feed won't change for the same Geant Feed Resource.
         //If it changes, the mmobj would keep it's original provider.
         if(!isset($mmobj)) {
-            $series = $this->seriesRepo->createQueryBuilder()
-                           ->field('properties.geant_provider')
-                           ->equals($parsedTerena['provider'])
-                           ->getQuery()
-                           ->getSingleResult();
-            if(!isset($series)) {
-                $series = $factory->createSeries();
-                $series->setProperty('geant_provider',$parsedTerena['provider']);
-                $series->setTitle($parsedTerena['provider']);
-            }
             $mmobj = $factory->createMultimediaObject($series, false);
             $mmobj->setProperty('geant_id', $parsedTerena['identifier']);
 
@@ -190,6 +196,8 @@ class FeedSyncService
             }
             $this->tagService->addTagToMultimediaObject($mmobj, $providerTag->getId(), false);
         }
+        $mmobj->setProperty('last_sync_date', $lastSyncDate);
+        $series->setProperty('last_sync_date', $lastSyncDate);
         //PUBLISH
         $mmobj->setStatus(MultimediaObject::STATUS_PUBLISHED);
         $this->tagService->addTagToMultimediaObject($mmobj, $this->webTVTag->getId(), false);
