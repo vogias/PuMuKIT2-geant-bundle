@@ -317,15 +317,19 @@ class FeedSyncService
             $track->addTag('display');
             $track->setOnlyAudio(true);
         }
-        else if ($this->feedProcesser->isYoutubeUrl($url)) {
-            $mmobj->setProperty('opencast', true); //Workaround to prevent editing the Schema Filter for now.
-            $mmobj->setProperty('iframeable', true);
-            $mmobj->setProperty('iframe_url', $this->feedProcesser->getYoutubeEmbedUrl($url));
-        }
         else {
-            $mmobj->setProperty('opencast', true); //Workaround to prevent editing the Schema Filter for now.
-            $mmobj->setProperty('redirect', true);
-            $mmobj->setProperty('redirect_url', $url);
+            //We try to create an embed Url. If we can't, it returns false and we'll redirect instead. (When other repositories provides more embedded urls we will change this)
+            $embedUrl = $this->feedProcesser->getYoutubeEmbedUrl($url);
+            if($embedUrl) {
+                $mmobj->setProperty('opencast', true); //Workaround to prevent editing the Schema Filter for now.
+                $mmobj->setProperty('iframeable', true);
+                $mmobj->setProperty('iframe_url', $embedUrl);
+            }
+            else {
+                $mmobj->setProperty('opencast', true); //Workaround to prevent editing the Schema Filter for now.
+                $mmobj->setProperty('redirect', true);
+                $mmobj->setProperty('redirect_url', $url);
+            }
         }
         $this->dm->persist($track);
         $track->addTag('geant_track');
