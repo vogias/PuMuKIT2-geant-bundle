@@ -37,8 +37,8 @@ class FeedSyncService
     private $webTVTag;
     private $optWall; //If true, prints warnings.
 
-    private $VIDEO_EXTENSIONS = array('mp4', 'm4v', 'm4b', 'wmv', 'avi');
-    private $AUDIO_EXTENSIONS = array('mp3', 'm4a', 'wav', 'wma', 'ogg');
+    private $VIDEO_EXTENSIONS = array('mp4', 'm4v', 'm4b');
+    private $AUDIO_EXTENSIONS = array('mp3', 'm4a', 'wav', 'ogg');
 
 
 
@@ -308,18 +308,21 @@ class FeedSyncService
         $track->setUrl($url);
 
         $format = explode('/', $parsedTerena['track_format']);
+        $formatType = isset($format[0])?$format[0]:null;
+        $formatExtension = isset($format[1])?$format[1]:null;
 
-        if( $format[0] == 'video' || in_array($urlExtension, $this->VIDEO_EXTENSIONS)) {
+        if( ($formatType == 'video' && in_array($formatExtension, $this->VIDEO_EXTENSIONS)) || in_array($urlExtension, $this->VIDEO_EXTENSIONS)) {
             $track->addTag('display');
             $track->setOnlyAudio(false);
         }
-        else if( $format[0] == 'audio' || in_array($urlExtension, $this->AUDIO_EXTENSIONS)) {
+        else if( ($formatType == 'audio' && in_array($formatExtension, $this->AUDIO_EXTENSIONS)) || in_array($urlExtension, $this->AUDIO_EXTENSIONS)) {
             $track->addTag('display');
             $track->setOnlyAudio(true);
         }
         else {
             //We try to create an embed Url. If we can't, it returns false and we'll redirect instead. (When other repositories provides more embedded urls we will change this)
             $embedUrl = $this->feedProcesser->getYoutubeEmbedUrl($url);
+
             if($embedUrl) {
                 $mmobj->setProperty('opencast', true); //Workaround to prevent editing the Schema Filter for now.
                 $mmobj->setProperty('iframeable', true);
