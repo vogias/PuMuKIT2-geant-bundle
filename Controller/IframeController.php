@@ -13,9 +13,13 @@ use Pumukit\SchemaBundle\Document\MultimediaObject;
 
 class IframeController extends PlayerController
 {
+    /**
+     * @Template("PumukitWebTVBundle:MultimediaObject:iframeplayer.html.twig")
+     */
     public function indexAction( MultimediaObject $multimediaObject, Request $request ){
         $iframeUrl = $multimediaObject->getProperty('iframe_url');
-        return $this->redirect($iframeUrl);
-        //TODO, instead of a redirect, it should show an iframe.
+        $this->updateBreadcrumbs($multimediaObject);
+        return array('multimediaObject' => $multimediaObject,
+                     'iframe_url' => $iframeUrl);
     }
 }

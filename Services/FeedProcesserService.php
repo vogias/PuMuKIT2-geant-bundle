@@ -232,4 +232,38 @@ class FeedProcesserService
         }
         return $mappedCode;
     }
+
+    /**
+     * Returns false if $url is not a valid youtube url. Otherwise returns int
+     */
+    public function isYoutubeUrl($url)
+    {
+        return preg_match('/youtu\.be\/((\w|\-)*)/', $url) ||
+               preg_match('/youtube.*(\&|\?)v\=(\w*)/', $url);
+    }
+
+    /**
+     * Returns the embedded url for a youtube video given its url. If it can't parse the youtube id, it returns false.
+     */
+    public function getYoutubeEmbedUrl($url)
+    {
+        $embedUrl = "https://www.youtube.com/embed/";
+        if(strpos($url, 'youtu.be')) {
+            preg_match('~youtu\.be/((\w|\-)*)~', $url, $matches);
+            if(!isset($matches[1])) {
+                return false;
+            }
+            $embedUrl .= $matches[1];
+        }
+        else {
+            preg_match('/youtube.*(\&|\?)v\=(\w*)/', $url, $matches);
+            if(!isset($matches[2])) {
+                return false;
+            }
+            $embedUrl .= $matches[2];
+        }
+
+        return $embedUrl;
+    }
+
 }
