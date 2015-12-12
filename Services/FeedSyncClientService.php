@@ -13,10 +13,11 @@ class FeedSyncClientService
 {
     private $feedUrl;
 
-    public function __construct($feedUrl, $logPath)
+    public function __construct($feedUrl, $logPath, $saveLogs = false)
     {
         $this->feedUrl = $feedUrl;
         $this->logPath = $logPath;
+        $this->saveLogs = $saveLogs;
         $this->init();
     }
     public function init()
@@ -79,7 +80,7 @@ class FeedSyncClientService
             $msg = "HTTP Request Failed. ". $url . "\nHTTP_CODE: " . $sal["status"] ." ". $sal["error"];
             throw new \ErrorException($msg);
         }
-        $this->saveCurlToDisk($sal["content"], $page);
+        if ($this->saveLogs) $this->saveCurlToDisk($sal["content"], $page);
         curl_close($ch);
         return $sal["content"];
     }
