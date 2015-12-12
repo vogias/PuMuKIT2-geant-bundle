@@ -117,7 +117,7 @@ class FeedSyncClientService
     function saveCurlToDisk($curlContent, $page)
     {
         $dateStr = (new \DateTime())->format('Y-m-d');
-        $dirLogs  = $this->logPath."GEANTFEED/".$dateStr;
+        $dirLogs  = $this->logPath."/GEANTFEED/".$dateStr;
         if(!is_dir($dirLogs)) {
             mkdir($dirLogs, 0777, true);
         }
