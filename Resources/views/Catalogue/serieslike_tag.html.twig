@@ -4,7 +4,7 @@
     <div class="pumukit_mmobj">
         <a href="{{ path_to_tag(tag.cod) }}">
             <figure class="pumukit_album">
-                <div class="thumbnail thumbnailo"><div class="thumbnailholder" ></div><img class="thumbnailimg" src="{{asset('bundles/pumukitgeantwebtv/images/sin_foto_serial.png') }} " /></div>
+                <div class="thumbnail thumbnailo"><div class="thumbnailholder" ></div><img class="thumbnailimg" src="{{ asset( tag.getProperty('thumbnail_url') )}} " /></div>
                 <div class="thumbnail thumbnailo"><div class="thumbnailholder" ></div><img class="thumbnailimg" src="" /></div>
                 <div class="thumbnail thumbnailo"><div class="thumbnailholder" ></div><img class="thumbnailimg" src="" /></div>
                 <span class="number-videos serial"><p>
@@ -20,6 +20,9 @@
                 <a href="{{ path('pumukit_webtv_categories_index', {'provider': tag.cod })}}">
                     <span class="glyphicon glyphicon-share"></span>
                 </a>
+                <p>
+                  {{tag.getProperty('description')}}
+                </p>
             </div>
         </div>
     </div>
