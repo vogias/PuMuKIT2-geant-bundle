@@ -12,18 +12,25 @@
                 </span>
             </figure>
         </a>
-        <div class="info serial" style="position: absolute; left: 137px;">
+        <div class="info-wrapper">
+          <div class="info">
             <div class="title tagcatalogue">
-                <a href="{{ path_to_tag(tag.cod) }}">
-                    {{tag.title | default('No title')|trans}}
-                </a>
-                <a href="{{ path('pumukit_webtv_categories_index', {'provider': tag.cod })}}">
-                    <span class="glyphicon glyphicon-share"></span>
-                </a>
-                <p>
-                  {{tag.getProperty('description')}}
-                </p>
+              <a href="{{ path_to_tag(tag.cod) }}">
+                {{tag.title | default('No title')|trans}}
+              </a>
+              <a href="{{ path('pumukit_webtv_categories_index', {'provider': tag.cod })}}">
+                <span class="glyphicon glyphicon-share"></span>
+              </a>
             </div>
+            <div class="description">
+              <div class="hidden-xs" style="overflow:hidden;height:4.2em;">
+                {{tag.getProperty('description')}}
+              </div>
+              <div class="visible-xs" style="overflow:hidden;height:5.7em;text-overflow:ellipsis; width:100%;white-space: nowrap;">
+                {{tag.getProperty('description')}}
+              </div>
+            </div>
+          </div>
         </div>
     </div>
 </div>
