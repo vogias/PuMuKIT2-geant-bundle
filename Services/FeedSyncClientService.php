@@ -43,10 +43,14 @@ class FeedSyncClientService
             //Gets page (Exception thrown if error)
             $out = $this->getFeedPage($page, 1000, $provider);
             $json = json_decode($out,true);
-
+            $ilast = $i;
             foreach ($json['results'] as $jsonResult){
                 $i++;
                 yield $jsonResult;
+            }
+            if($ilast != $i + 1000) {
+                //If $i didn't increase by 1000 (page count), either it is the last page, or there was an error. So we break the while loop.
+                break;
             }
             $page++;
         } while( $i <= $limit);

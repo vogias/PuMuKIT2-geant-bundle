@@ -43,7 +43,11 @@ class FeedProcesserService
         $processedObject['record_date'] = $this->processDateField($geantFeedObject['lastUpdateDate']);// or creationg date?
         $processedObject['copyright'] = $this->retrieveCopyright($geantFeedObject, $lang);
         $processedObject['license'] = $this->retrieveCopyright($geantFeedObject, $lang);
-        $processedObject['track_url'] = $geantFeedObject['expressions']['manifestations']['items']['url'];
+        $processedObject['track_url'] = isset($geantFeedObject['expressions']['manifestations']['items']['url'])?:'';
+
+        if($processedObject['track_url'] == '') {
+            throw new FeedSyncException(sprintf('The object with identifier: %s does not have an url (expressions/manifestations/items/url).', $processedObject['identifier']));
+        }
         if(isset($geantFeedObject['expressions']['manifestations']['format'])) {
             $format = $geantFeedObject['expressions']['manifestations']['format']; //NOTE This field should be mandatory (FCCN DOESN'T HAVE IT)
         }
