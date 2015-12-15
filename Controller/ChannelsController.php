@@ -100,8 +100,8 @@ class ChannelsController extends Controller
         // --- RETURN ---
         return array('type' => 'multimediaObject',
             'objects' => $pagerfanta,
-            'parent_tag' => $parentTag,
-            'parent_tag_optional' => null,
+            'parent_tag' => null,
+            'parent_tag_optional' => $parentTag,
             'tags_found' => $tagsFound,
             'number_cols' => $numberCols,
             'languages' => $searchLanguages,
