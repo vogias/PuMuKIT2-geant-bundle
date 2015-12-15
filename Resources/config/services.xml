@@ -8,6 +8,7 @@
         <service id="pumukit_web_tv.geant.feedsyncclient" class="Pumukit\Geant\WebTVBundle\Services\FeedSyncClientService">
           <argument>%geant.feedsyncservice.baseurl%</argument>
           <argument>%kernel.logs_dir%</argument>
+          <argument>%geant.savelogs%</argument>
         </service>
 
         <service id="pumukit_web_tv.geant.feedprocesser" class="Pumukit\Geant\WebTVBundle\Services\FeedProcesserService">

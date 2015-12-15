@@ -294,7 +294,11 @@ class FeedSyncService
     public function syncTrack(MultimediaObject $mmobj, $parsedTerena)
     {
         $url = $parsedTerena['track_url'];
-        $urlExtension = pathinfo((parse_url($parsedTerena['track_url'])['path']), PATHINFO_EXTENSION);
+        $urlParsed = parse_url($url);
+        //TODO if track_url add a error.
+        $urlExtension = isset($urlParsed['path']) ?
+                      pathinfo($urlParsed['path'], PATHINFO_EXTENSION) :
+                      null;
         $track = $mmobj->getTrackWithTag('geant_track');
         if(!isset($track)) {
             $track = new Track();

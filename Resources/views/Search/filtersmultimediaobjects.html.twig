@@ -21,7 +21,7 @@
                     {% endfor %}
                 </select>
             </div>
-            {% if parent_tag is not null and blocked_tag is null or not blocked_tag.isDescendantOf(parent_tag) %}
+            {% if parent_tag is not null and (blocked_tag is null or not blocked_tag.isDescendantOf(parent_tag) )%}
             <div class="form-group col-md-2 col-sm-3 col-xs-6">
                 <label for="tags">{% trans %} Subject{% endtrans %}{#}{{ parent_tag.title|trans}}#}</label>
                 <select id="tags" name="tags[]" class="form-control" onchange="javascript:this.form.submit();">
