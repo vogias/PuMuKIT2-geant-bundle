@@ -81,6 +81,14 @@ class FeedSyncService
         $this->optWall=false;
     }
 
+
+    public function blockUnsynced($output, $startTime, $timeRange = '30 days')
+    {
+        echo "blockUnsynced called";
+    }
+
+
+
     public function sync($output, $limit = 0, $optWall = false, $provider = null, $verbose = false, $setProgressBar = false)
     {
         $this->optWall = $optWall;
