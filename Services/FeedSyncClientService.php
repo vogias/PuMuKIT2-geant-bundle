@@ -48,7 +48,7 @@ class FeedSyncClientService
                 $i++;
                 yield $jsonResult;
             }
-            if($ilast != $i + 1000) {
+            if($ilast + 1000 != $i) {
                 //If $i didn't increase by 1000 (page count), either it is the last page, or there was an error. So we break the while loop.
                 break;
             }
