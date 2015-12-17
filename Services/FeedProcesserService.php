@@ -30,17 +30,19 @@ class FeedProcesserService
         if(empty($geantFeedObject['expressions'])) {
             throw new FeedSyncException(sprintf('ERROR: The Geant Feed with ID: %s  does not have a playable resource.',$geantFeedObject['identifier']));
         }
+        $date = $this->retrieveDate($geantFeedObject);
+        $lang = $this->retrieveLanguage($geantFeedObject);
+
         $processedObject['lastSyncDate'] = new \DateTime();
         $processedObject['provider'] = $geantFeedObject['set'];
         $processedObject['identifier'] = $geantFeedObject['identifier'];
         $processedObject['status'] = $geantFeedObject['status'];
-        $lang = $this->retrieveLanguage($geantFeedObject);
         $processedObject['language'] = $lang;
         $processedObject['title'] = $this->retrieveTitle($geantFeedObject, $lang);
         $processedObject['description'] = $this->retrieveDescription($geantFeedObject, $lang);
         $processedObject['keywords'] = $this->retrieveKeywords($geantFeedObject, $lang);
-        $processedObject['public_date'] = $this->processDateField($geantFeedObject['creationDate']);
-        $processedObject['record_date'] = $this->processDateField($geantFeedObject['lastUpdateDate']);// or creationg date?
+        $processedObject['public_date'] = $this->processDateField($date, $geantFeedObject);
+        $processedObject['record_date'] = $this->processDateField($date, $geantFeedObject);// or creation date?
         $processedObject['copyright'] = $this->retrieveCopyright($geantFeedObject, $lang);
         $processedObject['license'] = $this->retrieveCopyright($geantFeedObject, $lang);
         $processedObject['track_url'] = isset($geantFeedObject['expressions']['manifestations']['items']['url'])?$geantFeedObject['expressions']['manifestations']['items']['url']:'';
@@ -87,6 +89,29 @@ class FeedProcesserService
         }
 
         return $lang;
+    }
+
+    public function retrieveDate($geantFeedObject)
+    {
+        $date = null;
+        //if it's just one person...
+        if(isset($geantFeedObject['contributors']['date'])) {
+            $date = $geantFeedObject['contributors']['date'];
+        }
+        //If it's more than one...
+        else {
+            foreach($geantFeedObject['contributors'] as $person) {
+                if(isset($person['date'])) {
+                    $date = $person['date'];
+                    break;
+                }
+            }
+        }
+        //If we couldn't find the date after all...
+        if(!isset($date)){
+            throw new FeedSyncException(sprintf('The feed with ID: %s does not have a "date" field', $geantFeedObject['identifier']));
+        }
+        return $date;
     }
 
     public function retrieveTitle($geantFeedObject, $lang)
@@ -194,9 +219,14 @@ class FeedProcesserService
         return $people;
     }
 
-    public function processDateField($dateString)
+    public function processDateField($dateString, $geantFeedObject)
     {
-        $date = $dateString;
+        try {
+            $date = new \DateTime($dateString);
+        }
+        catch(\Exception $e) {
+            throw new FeedSyncException('The date: '.$dateString." from the geant feed object id:".$geantFeedObject['identifier']. "Could not be parsed\n".$dateString."\n");
+        }
         return $date;
     }
 
