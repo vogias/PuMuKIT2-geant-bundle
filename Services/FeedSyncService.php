@@ -72,6 +72,7 @@ class FeedSyncService
             $newTag->setDisplay(false);
             $newTag->setTitle('Provider');
             $this->dm->persist($newTag);
+            $this->dm->flush();
             $this->providerRootTag = $newTag;
         }
         $this->webTVTag = $this->tagRepo->findOneByCod('PUCHWEBTV');
