@@ -325,7 +325,7 @@ class FeedSyncService
         }
         else {
             //We try to create an embed Url. If we can't, it returns false and we'll redirect instead. (When other repositories provides more embedded urls we will change this)
-            $embedUrl = $this->feedProcesser->getYoutubeEmbedUrl($url);
+            $embedUrl = $this->feedProcesser->getEmbedUrl($url);
 
             if($embedUrl) {
                 $mmobj->setProperty('opencast', true); //Workaround to prevent editing the Schema Filter for now.
