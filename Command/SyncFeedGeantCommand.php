@@ -61,7 +61,10 @@ class SyncFeedGeantCommand extends ContainerAwareCommand
         $provider = $input->getOption('provider');
         $verbose = $input->getOption('showids')?true:false;
         $show_bar = $input->getOption('show-progress-bar')?true:false;
-        $feedSyncService->sync($output, $limit, $optWall, $provider, $verbose, $show_bar);
+        $output->writeln( "\nStarting sync...\n" );
+        $startTime = $feedSyncService->sync($output, $limit, $optWall, $provider, $verbose, $show_bar);
+        $output->writeln("\nSYNC FINISHED: Blocking Unsynced..");
+        $feedSyncService->blockUnsynced($output, $startTime);
         //SHUTDOWN HAPPILY
     }
 
