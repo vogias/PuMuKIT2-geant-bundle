@@ -225,7 +225,7 @@ class FeedProcesserService
             $date = new \DateTime($dateString);
         }
         catch(\Exception $e) {
-            throw new FeedSyncException('The date: '.$dateString." from the geant feed object id:".$geantFeedObject['identifier']. "Could not be parsed\n".$dateString."\n");
+            throw new FeedSyncException('The date: '.$dateString." from the geant feed object id:".$geantFeedObject['identifier']. "Could not be parsed");
         }
         return $date;
     }
