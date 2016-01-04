@@ -72,6 +72,7 @@ class FeedSyncService
             $newTag->setDisplay(false);
             $newTag->setTitle('Provider');
             $this->dm->persist($newTag);
+            $this->dm->flush();
             $this->providerRootTag = $newTag;
         }
         $this->webTVTag = $this->tagRepo->findOneByCod('PUCHWEBTV');
@@ -80,6 +81,48 @@ class FeedSyncService
         }
         $this->optWall=false;
     }
+
+
+    public function blockUnsynced($output, $startTime)
+    {
+        $mmobjs = $this->mmobjRepo->createQueryBuilder()->field('status')->notEqual(MultimediaObject::STATUS_BLOQ)->field('properties.last_sync_date')->lt($startTime)->getQuery()->execute();
+        $output->writeln("Blocking non-updated mmobjs...");
+        foreach($mmobjs as $mm) {
+            $output->writeln($mm->getId());
+            $mm->setStatus(MultimediaObject::STATUS_BLOQ);
+            $this->dm->persist($mm);
+            $this->dm->flush();
+        }
+        $output->writeln("Blocking empty tags...");
+        $providerTags = $this->providerRootTag->getChildren();
+        foreach($providerTags as $tag) {
+            $series = $this->seriesRepo->findOneBySeriesProperty('geant_provider', $tag->getCod());
+            if($series) {
+                $numMmobjs = $this->mmobjRepo->createBuilderWithSeries($series)
+                                  ->field('status')
+                                  ->equals(MultimediaObject::STATUS_PUBLISHED)
+                                  ->count()
+                                  ->getQuery()->execute();
+
+                if( $numMmobjs > 0) {
+                    $tag->setProperty('empty', false);
+                }
+                else {
+                    $output->writeln('Blocked: '.$tag->getId());
+                    $tag->setProperty('empty', true);
+                }
+            }
+            else {
+                $output->writeln('Blocked: '.$tag->getId());
+                $tag->setProperty('empty', true);
+            }
+            $this->dm->persist($tag);
+            $this->dm->flush();
+        }
+        $output->writeln("\nblockUnsynced() finished");
+    }
+
+
 
     public function sync($output, $limit = 0, $optWall = false, $provider = null, $verbose = false, $setProgressBar = false)
     {
@@ -107,9 +150,6 @@ class FeedSyncService
             }
             if($count % 10 == 0) {
                 $this->showProgressEstimateDuration ($time_started, $count, $total, $progressBar);
-            }
-            if($count > $limit) {
-                break;
             }
             try {
                 $parsedTerena = $this->feedProcesser->process( $terena );
@@ -141,6 +181,11 @@ class FeedSyncService
                 }
                 continue;
             }
+            if($count >= $limit) {
+                $this->dm->flush();
+                $this->dm->clear();
+                break;
+            }
             if($count % 50 == 0) {
                 $this->dm->flush();
                 $this->dm->clear();
@@ -151,7 +196,7 @@ class FeedSyncService
         if(isset($progressBar)) {
             $progressBar->finish();
         }
-
+        return $lastSyncDate;
     }
 
     public function syncMmobj( $parsedTerena , \MongoDate $lastSyncDate = null)
@@ -175,6 +220,7 @@ class FeedSyncService
             $series = $factory->createSeries();
             $series->setProperty('geant_provider',$parsedTerena['provider']);
             $series->setTitle($parsedTerena['provider']);
+            $this->dm->persist($series);
         }
 
         //We assume the 'provider' property of a feed won't change for the same Geant Feed Resource.
@@ -297,8 +343,8 @@ class FeedSyncService
         $urlParsed = parse_url($url);
         //TODO if track_url add a error.
         $urlExtension = isset($urlParsed['path']) ?
-                      pathinfo($urlParsed['path'], PATHINFO_EXTENSION) :
-                      null;
+                        pathinfo($urlParsed['path'], PATHINFO_EXTENSION) :
+                        null;
         $track = $mmobj->getTrackWithTag('geant_track');
         if(!isset($track)) {
             $track = new Track();
