@@ -33,7 +33,7 @@ class FeedProcesserService
         $date = $this->retrieveDate($geantFeedObject);
         $lang = $this->retrieveLanguage($geantFeedObject);
 
-        $processedObject['lastSyncDate'] = new \DateTime();
+        $processedObject['lastUpdateDate'] = $this->processDateField($geantFeedObject['lastUpdateDate'], $geantFeedObject);
         $processedObject['provider'] = $geantFeedObject['set'];
         $processedObject['identifier'] = $geantFeedObject['identifier'];
         $processedObject['status'] = $geantFeedObject['status'];

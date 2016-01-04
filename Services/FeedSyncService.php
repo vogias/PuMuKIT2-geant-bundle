@@ -242,6 +242,20 @@ class FeedSyncService
             }
             $this->tagService->addTagToMultimediaObject($mmobj, $providerTag->getId(), false);
         }
+        else {
+            $feedUpdatedDate = $mmobj->getProperty('feed_updated_date');
+            
+            if( !$feedUpdatedDate || $feedUpdatedDate < $parsedTerena['lastUpdateDate'])
+                $mmobj->setProperty('feed_updated_date', new \MongoDate($parsedTerena['lastUpdateDate']->getTimestamp()));
+            else {
+                $mmobj->setProperty('last_sync_date', $lastSyncDate);
+                $series->setProperty('last_sync_date', $lastSyncDate);
+                $mmobj->setStatus(MultimediaObject::STATUS_PUBLISHED);
+                $this->dm->persist($mmobj);
+                return 0;
+            }
+        }
+
         $mmobj->setProperty('last_sync_date', $lastSyncDate);
         $series->setProperty('last_sync_date', $lastSyncDate);
         //PUBLISH
