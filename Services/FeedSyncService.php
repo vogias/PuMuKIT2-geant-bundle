@@ -380,10 +380,12 @@ class FeedSyncService
     /**
      *
      */
-    public function syncRepos($output, $optWall, $show_bar)
+    public function syncRepos($output, $optWall, $show_bar, $reposDir)
     {
 
-        $dataFolder = $this->dataFolder->locateResource('@PumukitGeantWebTVBundle/Resources/data/repos_data');
+        if(!$reposDir) {
+            $reposDir = $this->dataFolder->locateResource('@PumukitGeantWebTVBundle/Resources/data/repos_data');
+        }
         $providers = $this->tagRepo->findOneBy(array('cod'=>'PROVIDER'))->getChildren();
         $defaultThumbnail = 'bundles/pumukitgeantwebtv/images/repositories/default_picture.png';
         
@@ -395,7 +397,7 @@ class FeedSyncService
         $progressBar->start();
                 
         foreach($providers as $provider) {
-            $fileDir = $dataFolder."/".$provider->getCod().".json";
+            $fileDir = $reposDir."/".$provider->getCod().".json";
             if(file_exists($fileDir)) {
                 $str = file_get_contents($fileDir);
                 $providerData = json_decode($str, true);
