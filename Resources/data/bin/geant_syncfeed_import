@@ -11,10 +11,18 @@ else
   if [ -z $pwd ]
     then
       php app/console geant:syncfeed:import --env=prod
+      rm -rf app/cache/all/pmk2geantgit
+      git clone https://github.com/teltek/PuMuKIT2-geant-bundle.git app/cache/all/pmk2geantgit
+      php app/console geant:syncrepos --env=prod --repos-directory="$(pwd)/app/cache/all/pmk2geantgit/Resources/data/repos_data"
       php app/console cache:clear --env=prod
+
   else
       php ../../../../../../app/console geant:syncfeed:import --env=prod
+      rm -rf ../../../../../../app/cache/all/pmk2geantgit
+      git clone https://github.com/teltek/PuMuKIT2-geant-bundle.git ../../../../../../app/cache/all/pmk2geantgit
+      php app/console geant:syncrepos --env=prod --repos-directory="$(pwd)/../../../../../../app/all/pmk2geantgit/Resources/data/repos_data"
       php ../../../../../../app/console cache:clear --env=prod
+
   fi
   wget -q -O /dev/null "$webroot/category/2" > /dev/null 2>&1
   wget -q -O /dev/null "$webroot/category/3" > /dev/null 2>&1
@@ -28,4 +36,5 @@ else
   wget -q -O /dev/null "$webroot/contact" > /dev/null 2>&1
   wget -q -O /dev/null "$webroot/about" > /dev/null 2>&1
   wget -q -O /dev/null "$webroot/searchmultimediaobjects" > /dev/null 2>&1
+
 fi
