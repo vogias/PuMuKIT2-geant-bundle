@@ -33,7 +33,7 @@ class FeedProcesserService
         $date = $this->retrieveDate($geantFeedObject);
         $lang = $this->retrieveLanguage($geantFeedObject);
 
-        $processedObject['lastSyncDate'] = new \DateTime();
+        $processedObject['lastUpdateDate'] = $this->processDateField($geantFeedObject['lastUpdateDate'], $geantFeedObject);
         $processedObject['provider'] = $geantFeedObject['set'];
         $processedObject['identifier'] = $geantFeedObject['identifier'];
         $processedObject['status'] = $geantFeedObject['status'];
@@ -225,7 +225,7 @@ class FeedProcesserService
             $date = new \DateTime($dateString);
         }
         catch(\Exception $e) {
-            throw new FeedSyncException('The date: '.$dateString." from the geant feed object id:".$geantFeedObject['identifier']. "Could not be parsed\n".$dateString."\n");
+            throw new FeedSyncException('The date: '.$dateString." from the geant feed object id:".$geantFeedObject['identifier']. "Could not be parsed");
         }
         return $date;
     }
@@ -276,6 +276,16 @@ class FeedProcesserService
                preg_match('/youtube.*(\&|\?)v\=(\w*)/', $url);
     }
 
+
+    public function getEmbedUrl($url)
+    {
+        $embedUrl = $this->getYoutubeEmbedUrl($url);
+        if(!$embedUrl) {
+            $embedUrl = $this->getUnedEmbedUrl($url);
+        }
+        return $embedUrl;
+    }
+
     /**
      * Returns the embedded url for a youtube video given its url. If it can't parse the youtube id, it returns false.
      */
@@ -297,6 +307,20 @@ class FeedProcesserService
             $embedUrl .= $matches[2];
         }
 
+        return $embedUrl;
+    }
+
+    /**
+     * Returns the embedded url for a canaluned video given its url. If it can't parse the uned mmobj id, it returns false.
+     */
+    public function getUnedEmbedUrl($url)
+    {
+        $embedUrl = "https://canal.uned.es/mmobj/iframe/id/";
+        $canalUnedUrl ='https://canal.uned.es/mmobj/index/id/';
+        if(strpos($canalUnedUrl, $url))
+            $embedUrl .= substr($url, strlen($canalUnedUrl));
+        else
+            $embedUrl = false;
         return $embedUrl;
     }
 

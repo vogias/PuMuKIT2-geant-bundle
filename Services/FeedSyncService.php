@@ -221,6 +221,7 @@ class FeedSyncService
             $series->setProperty('geant_provider',$parsedTerena['provider']);
             $series->setTitle($parsedTerena['provider']);
             $this->dm->persist($series);
+            $this->dm->flush();
         }
 
         //We assume the 'provider' property of a feed won't change for the same Geant Feed Resource.
@@ -242,6 +243,20 @@ class FeedSyncService
             }
             $this->tagService->addTagToMultimediaObject($mmobj, $providerTag->getId(), false);
         }
+        else {
+            $feedUpdatedDate = $mmobj->getProperty('feed_updated_date');
+            
+            if( !$feedUpdatedDate || $feedUpdatedDate < $parsedTerena['lastUpdateDate'])
+                $mmobj->setProperty('feed_updated_date', new \MongoDate($parsedTerena['lastUpdateDate']->getTimestamp()));
+            else {
+                $mmobj->setProperty('last_sync_date', $lastSyncDate);
+                $series->setProperty('last_sync_date', $lastSyncDate);
+                $mmobj->setStatus(MultimediaObject::STATUS_PUBLISHED);
+                $this->dm->persist($mmobj);
+                return 0;
+            }
+        }
+
         $mmobj->setProperty('last_sync_date', $lastSyncDate);
         $series->setProperty('last_sync_date', $lastSyncDate);
         //PUBLISH
@@ -265,6 +280,7 @@ class FeedSyncService
 
         //SAVE CHANGES
         $this->dm->persist($mmobj);
+        $this->dm->persist($series);
     }
 
     public function syncMetadata(MultimediaObject $mmobj, $parsedTerena)
@@ -371,7 +387,7 @@ class FeedSyncService
         }
         else {
             //We try to create an embed Url. If we can't, it returns false and we'll redirect instead. (When other repositories provides more embedded urls we will change this)
-            $embedUrl = $this->feedProcesser->getYoutubeEmbedUrl($url);
+            $embedUrl = $this->feedProcesser->getEmbedUrl($url);
 
             if($embedUrl) {
                 $mmobj->setProperty('opencast', true); //Workaround to prevent editing the Schema Filter for now.
