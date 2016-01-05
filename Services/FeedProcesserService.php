@@ -30,20 +30,26 @@ class FeedProcesserService
         if(empty($geantFeedObject['expressions'])) {
             throw new FeedSyncException(sprintf('ERROR: The Geant Feed with ID: %s  does not have a playable resource.',$geantFeedObject['identifier']));
         }
-        $processedObject['lastSyncDate'] = new \DateTime();
+        $date = $this->retrieveDate($geantFeedObject);
+        $lang = $this->retrieveLanguage($geantFeedObject);
+
+        $processedObject['lastUpdateDate'] = $this->processDateField($geantFeedObject['lastUpdateDate'], $geantFeedObject);
         $processedObject['provider'] = $geantFeedObject['set'];
         $processedObject['identifier'] = $geantFeedObject['identifier'];
         $processedObject['status'] = $geantFeedObject['status'];
-        $lang = $this->retrieveLanguage($geantFeedObject);
         $processedObject['language'] = $lang;
         $processedObject['title'] = $this->retrieveTitle($geantFeedObject, $lang);
         $processedObject['description'] = $this->retrieveDescription($geantFeedObject, $lang);
         $processedObject['keywords'] = $this->retrieveKeywords($geantFeedObject, $lang);
-        $processedObject['public_date'] = $this->processDateField($geantFeedObject['creationDate']);
-        $processedObject['record_date'] = $this->processDateField($geantFeedObject['lastUpdateDate']);// or creationg date?
+        $processedObject['public_date'] = $this->processDateField($date, $geantFeedObject);
+        $processedObject['record_date'] = $this->processDateField($date, $geantFeedObject);// or creation date?
         $processedObject['copyright'] = $this->retrieveCopyright($geantFeedObject, $lang);
         $processedObject['license'] = $this->retrieveCopyright($geantFeedObject, $lang);
-        $processedObject['track_url'] = $geantFeedObject['expressions']['manifestations']['items']['url'];
+        $processedObject['track_url'] = isset($geantFeedObject['expressions']['manifestations']['items']['url'])?$geantFeedObject['expressions']['manifestations']['items']['url']:'';
+
+        if($processedObject['track_url'] == '') {
+            throw new FeedSyncException(sprintf('The object with identifier: %s does not have an url (expressions/manifestations/items/url).', $processedObject['identifier']));
+        }
         if(isset($geantFeedObject['expressions']['manifestations']['format'])) {
             $format = $geantFeedObject['expressions']['manifestations']['format']; //NOTE This field should be mandatory (FCCN DOESN'T HAVE IT)
         }
@@ -83,6 +89,29 @@ class FeedProcesserService
         }
 
         return $lang;
+    }
+
+    public function retrieveDate($geantFeedObject)
+    {
+        $date = null;
+        //if it's just one person...
+        if(isset($geantFeedObject['contributors']['date'])) {
+            $date = $geantFeedObject['contributors']['date'];
+        }
+        //If it's more than one...
+        else {
+            foreach($geantFeedObject['contributors'] as $person) {
+                if(isset($person['date'])) {
+                    $date = $person['date'];
+                    break;
+                }
+            }
+        }
+        //If we couldn't find the date after all...
+        if(!isset($date)){
+            throw new FeedSyncException(sprintf('The feed with ID: %s does not have a "date" field', $geantFeedObject['identifier']));
+        }
+        return $date;
     }
 
     public function retrieveTitle($geantFeedObject, $lang)
@@ -190,9 +219,14 @@ class FeedProcesserService
         return $people;
     }
 
-    public function processDateField($dateString)
+    public function processDateField($dateString, $geantFeedObject)
     {
-        $date = $dateString;
+        try {
+            $date = new \DateTime($dateString);
+        }
+        catch(\Exception $e) {
+            throw new FeedSyncException('The date: '.$dateString." from the geant feed object id:".$geantFeedObject['identifier']. "Could not be parsed");
+        }
         return $date;
     }
 
@@ -242,6 +276,16 @@ class FeedProcesserService
                preg_match('/youtube.*(\&|\?)v\=(\w*)/', $url);
     }
 
+
+    public function getEmbedUrl($url)
+    {
+        $embedUrl = $this->getYoutubeEmbedUrl($url);
+        if(!$embedUrl) {
+            $embedUrl = $this->getUnedEmbedUrl($url);
+        }
+        return $embedUrl;
+    }
+
     /**
      * Returns the embedded url for a youtube video given its url. If it can't parse the youtube id, it returns false.
      */
@@ -263,6 +307,20 @@ class FeedProcesserService
             $embedUrl .= $matches[2];
         }
 
+        return $embedUrl;
+    }
+
+    /**
+     * Returns the embedded url for a canaluned video given its url. If it can't parse the uned mmobj id, it returns false.
+     */
+    public function getUnedEmbedUrl($url)
+    {
+        $embedUrl = "https://canal.uned.es/mmobj/iframe/id/";
+        $canalUnedUrl ='https://canal.uned.es/mmobj/index/id/';
+        if(strpos($canalUnedUrl, $url))
+            $embedUrl .= substr($url, strlen($canalUnedUrl));
+        else
+            $embedUrl = false;
         return $embedUrl;
     }
 

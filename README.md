@@ -46,7 +46,7 @@ $ php app/console pumukit:install:bundle Pumukit/Geant/WebTVBundle/PumukitGeantW
 For this bundle to work propertly it's necessary to also install the Podcast bundle:
 ```bash
 $ php app/console pumukit:install:bundle Pumukit/PodcastBundle/PumukitPodcastBundle
-$ php app/console podcast:init:tags --force
+$ php app/console podcast:init:itunesu --force
 ```
 
 
