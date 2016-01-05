@@ -43,7 +43,7 @@ class FeedSyncService
 
 
     public function __construct(FactoryService $factoryService, TagService $tagService, PersonService $personService, MultimediaObjectPicService $mmsPicService, FeedSyncClientService $feedClientService,
-                                FeedProcesserService $feedProcesserService,  DocumentManager $dm)
+                                FeedProcesserService $feedProcesserService,  DocumentManager $dm, $dataFolder)
     {
         //Schema Services
         $this->factoryService = $factoryService;
@@ -54,6 +54,7 @@ class FeedSyncService
         $this->feedClientService = $feedClientService;
         $this->feedProcesser = $feedProcesserService;
         $this->dm = $dm;
+        $this->dataFolder = $dataFolder;
         $this->init();
     }
     public function init()
@@ -440,5 +441,54 @@ class FeedSyncService
                  " minutes - estimated: " . sprintf('%.2F', $eta_min) .
                  " minutes. Speed: " . $processed_min . " terenas / minute.\n";
         }
+    }
+
+    /**
+     *
+     */
+    public function syncRepos($output, $optWall, $show_bar, $reposDir)
+    {
+
+        if(!$reposDir) {
+            $reposDir = $this->dataFolder->locateResource('@PumukitGeantWebTVBundle/Resources/data/repos_data');
+        }
+        $providers = $this->tagRepo->findOneBy(array('cod'=>'PROVIDER'))->getChildren();
+        $defaultThumbnail = 'bundles/pumukitgeantwebtv/images/repositories/default_picture.png';
+        
+        //Progress bar init.
+        $total = count($providers);
+        $progressBar = new ProgressBar($output, $total);
+        $progressBar->setFormat("<comment>%message%</comment>\n%current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%");
+        $progressBar->setMessage(' Loading repos metadata');
+        $progressBar->start();
+                
+        foreach($providers as $provider) {
+            $fileDir = $reposDir."/".$provider->getCod().".json";
+            if(file_exists($fileDir)) {
+                $str = file_get_contents($fileDir);
+                $providerData = json_decode($str, true);
+                $provider->setProperty('description', $providerData['description']);
+                $provider->setTitle($providerData['title']);
+                $thumbnailUrl = $this->parseThumbnailUrl($providerData['thumbnail_url']);
+                $provider->setProperty('thumbnail_url', $thumbnailUrl);
+            }
+            else {
+                $provider->setProperty('description','');
+                $provider->setProperty('thumbnail_url', $defaultThumbnail);
+                $provider->setTitle($provider->getCod());
+            }
+            $this->dm->persist($provider);
+            $progressBar->advance();
+        }
+        $progressBar->finish();
+        $output->writeln("\nALL LOADED\n");
+        $this->dm->flush();
+    }
+    protected function parseThumbnailUrl($thumbUrl)
+    {
+        if(strpos($thumbUrl, 'http') !== false)
+            return $thumbUrl;
+        else
+            return '/bundles/pumukitgeantwebtv/images/repositories/'.$thumbUrl;
     }
 }
