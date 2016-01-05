@@ -27,7 +27,14 @@ class SyncReposMetadataCommand extends ContainerAwareCommand
                 'b',
                 InputOption::VALUE_NONE,
                 'If set, the task will output a symfony style progress bar.'
+            )
+        ->addOption(
+                'repos-directory',
+                'd',
+                InputOption::VALUE_OPTIONAL,
+                'If set, the task will use the repos-directory (/tmp/pmkgeant by default)'
             )    ;
+
     }
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -39,7 +46,8 @@ class SyncReposMetadataCommand extends ContainerAwareCommand
         $feedSyncService = $this->getContainer()->get('pumukit_web_tv.geant.feedsync');
         $optWall = $input->getOption('Wall')?true:false;
         $show_bar = $input->getOption('show-progress-bar')?true:false;
-        $feedSyncService->syncRepos($output, $optWall, $show_bar);
+        $repos_dir = $input->getOption('repos-directory');
+        $feedSyncService->syncRepos($output, $optWall, $show_bar, $repos_dir);
         //SHUTDOWN HAPPILY
     }
 
