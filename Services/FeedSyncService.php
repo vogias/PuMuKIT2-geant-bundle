@@ -415,7 +415,7 @@ class FeedSyncService
             $progressBar->advance();
         }
         $progressBar->finish();
-        echo "\nALL LOADED\n";
+        $output->writeln("\nALL LOADED\n");
         $this->dm->flush();
     }
     protected function parseThumbnailUrl($thumbUrl)
