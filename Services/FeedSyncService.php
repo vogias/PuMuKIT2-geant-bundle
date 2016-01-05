@@ -221,6 +221,7 @@ class FeedSyncService
             $series->setProperty('geant_provider',$parsedTerena['provider']);
             $series->setTitle($parsedTerena['provider']);
             $this->dm->persist($series);
+            $this->dm->flush();
         }
 
         //We assume the 'provider' property of a feed won't change for the same Geant Feed Resource.
@@ -279,6 +280,7 @@ class FeedSyncService
 
         //SAVE CHANGES
         $this->dm->persist($mmobj);
+        $this->dm->persist($series);
     }
 
     public function syncMetadata(MultimediaObject $mmobj, $parsedTerena)
