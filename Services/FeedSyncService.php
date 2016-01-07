@@ -88,11 +88,16 @@ class FeedSyncService
     {
         $mmobjs = $this->mmobjRepo->createQueryBuilder()->field('status')->notEqual(MultimediaObject::STATUS_BLOQ)->field('properties.last_sync_date')->lt($startTime)->getQuery()->execute();
         $output->writeln("Blocking non-updated mmobjs...");
+        $count = 0;
         foreach($mmobjs as $mm) {
+            $count++;
             $output->writeln($mm->getId());
             $mm->setStatus(MultimediaObject::STATUS_BLOQ);
             $this->dm->persist($mm);
-            $this->dm->flush();
+            if($count % 200 == 0) {
+                $this->dm->flush();
+                $this->dm->clear();
+            }
         }
         $output->writeln("Blocking empty tags...");
         $providerTags = $this->providerRootTag->getChildren();
