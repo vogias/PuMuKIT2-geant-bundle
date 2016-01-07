@@ -87,11 +87,10 @@ class FeedSyncService
     public function blockUnsynced($output, $startTime)
     {
         $mmobjs = $this->mmobjRepo->createQueryBuilder()->field('status')->notEqual(MultimediaObject::STATUS_BLOQ)->field('properties.last_sync_date')->lt($startTime)->getQuery()->execute();
-        $output->writeln("Blocking non-updated mmobjs...");
+        $output->writeln("...Blocking non-updated mmobjs...");
         $count = 0;
         foreach($mmobjs as $mm) {
             $count++;
-            $output->writeln($mm->getId());
             $mm->setStatus(MultimediaObject::STATUS_BLOQ);
             $this->dm->persist($mm);
             if($count % 200 == 0) {
@@ -99,8 +98,10 @@ class FeedSyncService
                 $this->dm->clear();
             }
         }
-        $output->writeln("Blocking empty tags...");
+        $output->writeln(sprintf("Number of blocked mmobjs: %s", $count));
+        $output->writeln("...Blocking empty tags...");
         $providerTags = $this->providerRootTag->getChildren();
+        $count = 0;
         foreach($providerTags as $tag) {
             $series = $this->seriesRepo->findOneBySeriesProperty('geant_provider', $tag->getCod());
             if($series) {
@@ -114,18 +115,23 @@ class FeedSyncService
                     $tag->setProperty('empty', false);
                 }
                 else {
-                    $output->writeln('Blocked: '.$tag->getId());
-                    $tag->setProperty('empty', true);
+                    if(!$tag->getProperty('empty', false)) {
+                        $tag->setProperty('empty', true);
+                        $count++;
+                    }
                 }
             }
             else {
-                $output->writeln('Blocked: '.$tag->getId());
-                $tag->setProperty('empty', true);
+                if(!$tag->getProperty('empty', false)) {
+                    $tag->setProperty('empty', true);
+                    $count++;
+                }
             }
             $this->dm->persist($tag);
             $this->dm->flush();
         }
-        $output->writeln("\nblockUnsynced() finished");
+        $output->writeln(sprintf("Number of blocked providers: %s", $count));
+        $output->writeln("-----------\nblockUnsynced() finished");
     }
 
 
@@ -134,6 +140,7 @@ class FeedSyncService
     {
         $this->optWall = $optWall;
         $this->verbose = $verbose;
+        $loggedResults = array();
         $time_started = microtime(true);
         $count = 0;
         $total = $this->feedClientService->getFeedTotal($provider);
@@ -157,6 +164,18 @@ class FeedSyncService
             if($count % 10 == 0) {
                 $this->showProgressEstimateDuration ($time_started, $count, $total, $progressBar);
             }
+
+            $providerCode = $terena['set'];
+            //Initializes the provider log.
+            if(!isset($loggedResults[$providerCode])) {
+                
+                $loggedResults[$providerCode] = array();
+                $loggedResults[$providerCode]['total'] = 0;
+                $loggedResults[$providerCode]['failed'] = array();
+            }
+            //We increase the number of objects on the log for this repository:
+            $loggedResults[$providerCode]['total']++;
+
             try {
                 $parsedTerena = $this->feedProcesser->process( $terena );
             } catch (FeedSyncException $e) {
@@ -170,9 +189,11 @@ class FeedSyncService
                 else {
                     echo sprintf("\nPARSING GENERATOR EXCEPTION: -Message: %s \n",$e->getMessage());
                 }
+                $loggedResults[$providerCode]['failed'][] = $e->getMessage();
                 continue;
             }
-            try {
+
+            try {            
                 $this->syncMmobj($parsedTerena, $lastSyncDate);
             }
             catch (FeedSyncException $e) {
@@ -185,8 +206,10 @@ class FeedSyncService
                 else {
                     echo sprintf("\nSYNC GENERATOR EXCEPTION: \n-Message: %s \n----",$e->getMessage());
                 }
+                $loggedResults[$providerCode]['failed'][] = $e->getMessage();
                 continue;
             }
+            
             if($count >= $limit) {
                 $this->dm->flush();
                 $this->dm->clear();
@@ -202,6 +225,9 @@ class FeedSyncService
         if(isset($progressBar)) {
             $progressBar->finish();
         }
+
+        $this->printLoggedResults($loggedResults, $output);
+
         return $lastSyncDate;
     }
 
@@ -489,11 +515,39 @@ class FeedSyncService
         $output->writeln("\nALL LOADED\n");
         $this->dm->flush();
     }
+
     protected function parseThumbnailUrl($thumbUrl)
     {
         if(strpos($thumbUrl, 'http') !== false)
             return $thumbUrl;
         else
             return '/bundles/pumukitgeantwebtv/images/repositories/'.$thumbUrl;
+    }
+    
+    /**
+     * Prints the results logged by
+     */
+    protected function printLoggedResults($loggedResults, $output) 
+    {
+        $output->writeln("---------");
+        $output->writeln("-------- IMPORTED OBJECTS STATISTICS --------");
+        $output->writeln("Total Providers: ".count($loggedResults));
+        $allObjects = 0;
+        foreach($loggedResults as $name=>$result) {
+            $failedNumber = count($result['failed']);
+            $totalNumber = $result['total'];
+            $successNumber = $totalNumber - $failedNumber;
+            $successPercentage = ($successNumber/$totalNumber)*100;
+            $output->writeln(sprintf(" - %s: %01.2f%% of Objects were added.  (%s/%s Objects)", $name, $successPercentage, $successNumber, $totalNumber));
+        }
+        $output->writeln(' -------- DETAILED RESULTS: --------');
+        foreach($loggedResults as $name=>$result) {
+            $output->writeln(" .......... ".$name." .......... ");
+            foreach($result['failed'] as $error) {
+                $output->writeln(sprintf(" - %s: ", $error));
+            }
+            $output->writeln(" ................. ");
+        }
+        $output->writeln("-------------");
     }
 }
