@@ -40,7 +40,7 @@ class CatalogueController extends Controller
                     $repository['title'] = $tag->getTitle();
                     $repository['cod'] = $providerId;
                     $repository['description'] = $tag->getProperty('description');
-                    $repository['image_url'] = $tag->getProperty('image_url');
+                    $repository['image_url'] = $tag->getProperty('thumbnail_url');
                     $repository['numberMultimediaObjects'] = $numMmobjs;
                     $repositories[$providerId] = $repository;
                 }
