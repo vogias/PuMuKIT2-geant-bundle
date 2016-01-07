@@ -13,7 +13,7 @@ else
       php app/console geant:syncfeed:import --env=prod
       rm -rf app/cache/all/pmk2geantgit
       git clone https://github.com/teltek/PuMuKIT2-geant-bundle.git app/cache/all/pmk2geantgit
-      cp app/cache/all/pmk2geantgit/Resources/data/repos_data/* app/cache/all/pmk2geantgit/Resources/public/images/repositories/
+      cp app/cache/all/pmk2geantgit/Resources/data/repos_data/* web/bundles/pumukitgeantwebtv/images/repositories/
       php app/console geant:syncrepos --env=prod --repos-directory="$(pwd)/app/cache/all/pmk2geantgit/Resources/data/repos_data"
       php app/console cache:clear --env=prod
 
@@ -21,7 +21,7 @@ else
       php ../../../../../../app/console geant:syncfeed:import --env=prod
       rm -rf ../../../../../../app/cache/all/pmk2geantgit
       git clone https://github.com/teltek/PuMuKIT2-geant-bundle.git ../../../../../../app/cache/all/pmk2geantgit
-      cp ../../../../../../app/cache/all/pmk2geantgit/Resources/data/repos_data/* ../../../../../../app/cache/all/pmk2geantgit/Resources/public/images/repositories/
+      cp ../../../../../../app/cache/all/pmk2geantgit/Resources/data/repos_data/* ../../../../../../web/bundles/pumukitgeantwebtv/images/repositories/
       php app/console geant:syncrepos --env=prod --repos-directory="$(pwd)/../../../../../../app/all/pmk2geantgit/Resources/data/repos_data"
       php ../../../../../../app/console cache:clear --env=prod
 
