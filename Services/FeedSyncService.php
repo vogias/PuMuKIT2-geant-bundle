@@ -1,9 +1,8 @@
 <?php
+
 namespace Pumukit\Geant\WebTVBundle\Services;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Pumukit\SchemaBundle\Document\MultimediaObject;
 use Pumukit\SchemaBundle\Document\Person;
 use Pumukit\SchemaBundle\Document\Series;
@@ -17,7 +16,6 @@ use Symfony\Component\Console\Helper\ProgressBar;
 
 /**
  *  Service that iterates over the FeedSyncClientService responses, it processes them using the FeedProcesserService and then inserts/updates the object into the database.
- *
  */
 class FeedSyncService
 {
@@ -39,8 +37,6 @@ class FeedSyncService
 
     private $VIDEO_EXTENSIONS = array('mp4', 'm4v', 'm4b');
     private $AUDIO_EXTENSIONS = array('mp3', 'm4a', 'wav', 'ogg');
-
-
 
     public function __construct(FactoryService $factoryService, TagService $tagService, PersonService $personService, MultimediaObjectPicService $mmsPicService, FeedSyncClientService $feedClientService,
                                 FeedProcesserService $feedProcesserService,  DocumentManager $dm, $dataFolder)
@@ -65,7 +61,7 @@ class FeedSyncService
         $this->personRepo = $this->dm->getRepository('PumukitSchemaBundle:Person');
         $this->roleRepo = $this->dm->getRepository('PumukitSchemaBundle:Role');
         $this->providerRootTag = $this->tagRepo->findOneByCod('PROVIDER');
-        if(!isset($this->providerRootTag)) {
+        if (!isset($this->providerRootTag)) {
             $newTag = new Tag();
             $newTag->setParent($this->tagRepo->findOneByCod('ROOT'));
             $newTag->setCod('PROVIDER');
@@ -77,132 +73,154 @@ class FeedSyncService
             $this->providerRootTag = $newTag;
         }
         $this->webTVTag = $this->tagRepo->findOneByCod('PUCHWEBTV');
-        if(!isset($this->webTVTag)) {
+        if (!isset($this->webTVTag)) {
             throw new FeedSyncException('Tag: PUCHWEBTV does not exists. Did you initialize the repository? (pumukit:init:repo)');
         }
-        $this->optWall=false;
+        $this->optWall = false;
     }
-
 
     public function blockUnsynced($output, $startTime)
     {
         $mmobjs = $this->mmobjRepo->createQueryBuilder()->field('status')->notEqual(MultimediaObject::STATUS_BLOQ)->field('properties.last_sync_date')->lt($startTime)->getQuery()->execute();
-        $output->writeln("Blocking non-updated mmobjs...");
-        foreach($mmobjs as $mm) {
-            $output->writeln($mm->getId());
+        $output->writeln('...Blocking non-updated mmobjs...');
+        $count = 0;
+        foreach ($mmobjs as $mm) {
+            ++$count;
             $mm->setStatus(MultimediaObject::STATUS_BLOQ);
             $this->dm->persist($mm);
-            $this->dm->flush();
+            if ($count % 200 == 0) {
+                $this->dm->flush();
+                $this->dm->clear();
+            }
         }
-        $output->writeln("Blocking empty tags...");
+        $output->writeln(sprintf('Number of blocked mmobjs: %s', $count));
+        $output->writeln('...Blocking empty tags...');
         $providerTags = $this->providerRootTag->getChildren();
-        foreach($providerTags as $tag) {
+        $count = 0;
+        foreach ($providerTags as $tag) {
             $series = $this->seriesRepo->findOneBySeriesProperty('geant_provider', $tag->getCod());
-            if($series) {
+            if ($series) {
                 $numMmobjs = $this->mmobjRepo->createBuilderWithSeries($series)
                                   ->field('status')
                                   ->equals(MultimediaObject::STATUS_PUBLISHED)
                                   ->count()
                                   ->getQuery()->execute();
 
-                if( $numMmobjs > 0) {
+                if ($numMmobjs > 0) {
                     $tag->setProperty('empty', false);
+                } else {
+                    if (!$tag->getProperty('empty', false)) {
+                        $tag->setProperty('empty', true);
+                        ++$count;
+                    }
                 }
-                else {
-                    $output->writeln('Blocked: '.$tag->getId());
+            } else {
+                if (!$tag->getProperty('empty', false)) {
                     $tag->setProperty('empty', true);
+                    ++$count;
                 }
-            }
-            else {
-                $output->writeln('Blocked: '.$tag->getId());
-                $tag->setProperty('empty', true);
             }
             $this->dm->persist($tag);
             $this->dm->flush();
         }
-        $output->writeln("\nblockUnsynced() finished");
+        $output->writeln(sprintf('Number of blocked providers: %s', $count));
+        $output->writeln("-----------\nblockUnsynced() finished");
     }
-
-
 
     public function sync($output, $limit = 0, $optWall = false, $provider = null, $verbose = false, $setProgressBar = false)
     {
         $this->optWall = $optWall;
         $this->verbose = $verbose;
+        $loggedResults = array();
         $time_started = microtime(true);
         $count = 0;
         $total = $this->feedClientService->getFeedTotal($provider);
-        if($limit == 0 || $limit > $total){
+        if ($limit == 0 || $limit > $total) {
             $limit = $total;
         }
         $progressBar = null;
-        if($setProgressBar){
+        if ($setProgressBar) {
             $progressBar = new ProgressBar($output, $total);
             $progressBar->setFormat("<comment>%message%</comment>\n%current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%");
             $progressBar->setMessage(' Syncing with Geant Feed...');
             $progressBar->start();
         }
-        $terenaGenerator = $this->feedClientService->getFeed( $limit, $provider );
+        $terenaGenerator = $this->feedClientService->getFeed($limit, $provider);
         $lastSyncDate = new \MongoDate();
-        foreach( $terenaGenerator as $terena) {
-            $count++;
-            if($verbose) {
-                echo sprintf("\nImporting object: id: %s\n",$terena['identifier']);
+        foreach ($terenaGenerator as $terena) {
+            ++$count;
+            if ($verbose) {
+                echo sprintf("\nImporting object: id: %s\n", $terena['identifier']);
             }
-            if($count % 10 == 0) {
-                $this->showProgressEstimateDuration ($time_started, $count, $total, $progressBar);
+            if ($count % 10 == 0) {
+                $this->showProgressEstimateDuration($time_started, $count, $total, $progressBar);
             }
+
+            $providerCode = $terena['set'];
+            //Initializes the provider log.
+            if (!isset($loggedResults[$providerCode])) {
+                $loggedResults[$providerCode] = array();
+                $loggedResults[$providerCode]['total'] = 0;
+                $loggedResults[$providerCode]['failed'] = array();
+            }
+            //We increase the number of objects on the log for this repository:
+            ++$loggedResults[$providerCode]['total'];
+
             try {
-                $parsedTerena = $this->feedProcesser->process( $terena );
+                $parsedTerena = $this->feedProcesser->process($terena);
             } catch (FeedSyncException $e) {
-                if(isset($progressBar)) {
+                if (isset($progressBar)) {
                     //Log exception error.
                     $progressBar->clear();
-                    echo sprintf("\nPARSING GENERATOR EXCEPTION: -Message: %s \n",$e->getMessage());
+                    echo sprintf("\nPARSING GENERATOR EXCEPTION: -Message: %s \n", $e->getMessage());
                     echo "\n";
                     $progressBar->display();
+                } else {
+                    echo sprintf("\nPARSING GENERATOR EXCEPTION: -Message: %s \n", $e->getMessage());
                 }
-                else {
-                    echo sprintf("\nPARSING GENERATOR EXCEPTION: -Message: %s \n",$e->getMessage());
-                }
+                $loggedResults[$providerCode]['failed'][] = $e->getMessage();
                 continue;
             }
+
             try {
                 $this->syncMmobj($parsedTerena, $lastSyncDate);
-            }
-            catch (FeedSyncException $e) {
-                if(isset($progressBar)) {
+            } catch (FeedSyncException $e) {
+                if (isset($progressBar)) {
                     $progressBar->clear();
-                    echo sprintf("\nSYNC GENERATOR EXCEPTION: \n-Message: %s \n----",$e->getMessage());
+                    echo sprintf("\nSYNC GENERATOR EXCEPTION: \n-Message: %s \n----", $e->getMessage());
                     echo "\n";
                     $progressBar->display();
+                } else {
+                    echo sprintf("\nSYNC GENERATOR EXCEPTION: \n-Message: %s \n----", $e->getMessage());
                 }
-                else {
-                    echo sprintf("\nSYNC GENERATOR EXCEPTION: \n-Message: %s \n----",$e->getMessage());
-                }
+                $loggedResults[$providerCode]['failed'][] = $e->getMessage();
                 continue;
             }
-            if($count >= $limit) {
+
+            if ($count >= $limit) {
                 $this->dm->flush();
                 $this->dm->clear();
                 break;
             }
-            if($count % 50 == 0) {
+            if ($count % 50 == 0) {
                 $this->dm->flush();
                 $this->dm->clear();
             }
         }
         $this->dm->flush();
         $this->dm->clear();
-        if(isset($progressBar)) {
+        if (isset($progressBar)) {
             $progressBar->finish();
         }
+
+        $this->printLoggedResults($loggedResults, $output);
+
         return $lastSyncDate;
     }
 
-    public function syncMmobj( $parsedTerena , \MongoDate $lastSyncDate = null)
+    public function syncMmobj($parsedTerena, \MongoDate $lastSyncDate = null)
     {
-        if(!isset($lastSyncDate)) {
+        if (!isset($lastSyncDate)) {
             $lastSyncDate = new \MongoDate();
         }
         $factory = $this->factoryService;
@@ -217,9 +235,9 @@ class FeedSyncService
                        ->equals($parsedTerena['provider'])
                        ->getQuery()
                        ->getSingleResult();
-        if(!isset($series)) {
+        if (!isset($series)) {
             $series = $factory->createSeries();
-            $series->setProperty('geant_provider',$parsedTerena['provider']);
+            $series->setProperty('geant_provider', $parsedTerena['provider']);
             $series->setTitle($parsedTerena['provider']);
             $this->dm->persist($series);
             $this->dm->flush();
@@ -227,13 +245,13 @@ class FeedSyncService
 
         //We assume the 'provider' property of a feed won't change for the same Geant Feed Resource.
         //If it changes, the mmobj would keep it's original provider.
-        if(!isset($mmobj)) {
+        if (!isset($mmobj)) {
             $mmobj = $factory->createMultimediaObject($series, false);
             $mmobj->setProperty('geant_id', $parsedTerena['identifier']);
 
             //Add 'provider' tag
             $providerTag = $this->tagRepo->findOneByCod($parsedTerena['provider']);
-            if(!isset($providerTag)) {
+            if (!isset($providerTag)) {
                 $providerTag = new Tag();
                 $providerTag->setParent($this->providerRootTag);
                 $providerTag->setCod($parsedTerena['provider']);
@@ -243,17 +261,17 @@ class FeedSyncService
                 $this->dm->persist($providerTag);
             }
             $this->tagService->addTagToMultimediaObject($mmobj, $providerTag->getId(), false);
-        }
-        else {
+        } else {
             $feedUpdatedDate = $mmobj->getProperty('feed_updated_date');
-            
-            if( !$feedUpdatedDate || $feedUpdatedDate < $parsedTerena['lastUpdateDate'])
+
+            if (!$feedUpdatedDate || $feedUpdatedDate < $parsedTerena['lastUpdateDate']) {
                 $mmobj->setProperty('feed_updated_date', new \MongoDate($parsedTerena['lastUpdateDate']->getTimestamp()));
-            else {
+            } else {
                 $mmobj->setProperty('last_sync_date', $lastSyncDate);
                 $series->setProperty('last_sync_date', $lastSyncDate);
                 $mmobj->setStatus(MultimediaObject::STATUS_PUBLISHED);
                 $this->dm->persist($mmobj);
+
                 return 0;
             }
         }
@@ -288,7 +306,7 @@ class FeedSyncService
     {
         $mmobj->setTitle($parsedTerena['title']);
         $mmobj->setDescription($parsedTerena['description']);
-        foreach($parsedTerena['keywords'] as $keyword) {
+        foreach ($parsedTerena['keywords'] as $keyword) {
             $mmobj->setKeyword($keyword);
         }
         $mmobj->setLicense($parsedTerena['license']);
@@ -300,30 +318,32 @@ class FeedSyncService
 
     public function syncTags(MultimediaObject $mmobj, $parsedTerena)
     {
-        foreach($parsedTerena['tags'] as $parsedTag) {
+        foreach ($parsedTerena['tags'] as $parsedTag) {
             $parsedTag = strval($parsedTag); //Sometimes they are ints.
             $tag = $this->tagRepo->findOneByCod($parsedTag);//First we search by code on the database (it should be iTunesU, but could be other)
 
-            if(!isset($tag))  //Second we search by title on the database (again, it should be iTunesU, but could be other)
+            if (!isset($tag)) {  //Second we search by title on the database (again, it should be iTunesU, but could be other)
                 $tag = $this->tagRepo->findOneByTitle($parsedTag);
+            }
 
-            if(!isset($tag))  //Now we start getting tricky. We search the cod, but adding 'U' (It should be UNESCO)
-                $tag = $this->tagRepo->findOneByCod(sprintf('U%s',$parsedTag));
+            if (!isset($tag)) {  //Now we start getting tricky. We search the cod, but adding 'U' (It should be UNESCO)
+                $tag = $this->tagRepo->findOneByCod(sprintf('U%s', $parsedTag));
+            }
 
-            if(!isset($tag)) { //If we can't find it here, all hope is lost. We log it and continue.
-                if($this->optWall){
-                    echo "\n".sprintf('Warning: The tag with cod/title %s from the Feed ID:%s does not exist on PuMuKIT',$parsedTag,$parsedTerena['identifier']);
+            if (!isset($tag)) { //If we can't find it here, all hope is lost. We log it and continue.
+                if ($this->optWall) {
+                    echo "\n".sprintf('Warning: The tag with cod/title %s from the Feed ID:%s does not exist on PuMuKIT', $parsedTag, $parsedTerena['identifier']);
                 }
                 continue;
             }
 
             //If the tag turned out to be from UNESCO, we try to add the iTunesU mapped tag
-            if($tag->isDescendantOfByCod('UNESCO')) {
-                $mappedItunesTags = $this->feedProcesser->mapCodeToItunes(sprintf('U%s',substr($parsedTag,0,3)));
-                foreach($mappedItunesTags as $itunesTag) {
+            if ($tag->isDescendantOfByCod('UNESCO')) {
+                $mappedItunesTags = $this->feedProcesser->mapCodeToItunes(sprintf('U%s', substr($parsedTag, 0, 3)));
+                foreach ($mappedItunesTags as $itunesTag) {
                     $iTag = $this->tagRepo->findOneByCod($itunesTag);
-                    if(!isset($iTag)) {
-                        throw new FeedSyncException(sprintf('Error! The parsed iTunes tag with code: %s  doesnt exists on PuMuKIT. Did you initialize the iTunes repo?' ,$itunesTag));
+                    if (!isset($iTag)) {
+                        throw new FeedSyncException(sprintf('Error! The parsed iTunes tag with code: %s  doesnt exists on PuMuKIT. Did you initialize the iTunes repo?', $itunesTag));
                     }
                     $this->tagService->addTagToMultimediaObject($mmobj, $iTag->getId(), false);
                 }
@@ -334,19 +354,20 @@ class FeedSyncService
 
     public function syncPeople(MultimediaObject $mmobj, $parsedTerena)
     {
-        foreach( $parsedTerena['people'] as $contributor) {
+        foreach ($parsedTerena['people'] as $contributor) {
             $person = $this->personRepo->findOneByName($contributor['name']);
-            if(!isset($person)) { //If the person doesn't exist, create a new one.
+            if (!isset($person)) { //If the person doesn't exist, create a new one.
                 $person = new Person();
                 $person->setName($contributor['name']);
                 $this->personService->savePerson($person);
             }
 
             $role = $this->roleRepo->findOneByCod($contributor['role']);
-            if(!isset($role))  //Workaround for PuMuKIT. The 'Cod' field is not consistent, some are lowercase, some are ucfirst
+            if (!isset($role)) {  //Workaround for PuMuKIT. The 'Cod' field is not consistent, some are lowercase, some are ucfirst
                 $role = $this->roleRepo->findOneByCod(ucfirst($contributor['role']));
+            }
 
-            if(!isset($role)) { //If the role doesn't exist, use 'Participant'.
+            if (!isset($role)) { //If the role doesn't exist, use 'Participant'.
                 $role = $this->roleRepo->findOneByCod('Participant'); // <-- This cod is ucfirst, but others are lowercase.
             }
 
@@ -363,7 +384,7 @@ class FeedSyncService
                         pathinfo($urlParsed['path'], PATHINFO_EXTENSION) :
                         null;
         $track = $mmobj->getTrackWithTag('geant_track');
-        if(!isset($track)) {
+        if (!isset($track)) {
             $track = new Track();
             $mmobj->addTrack($track);
         }
@@ -375,27 +396,24 @@ class FeedSyncService
         $track->setUrl($url);
 
         $format = explode('/', $parsedTerena['track_format']);
-        $formatType = isset($format[0])?$format[0]:null;
-        $formatExtension = isset($format[1])?$format[1]:null;
+        $formatType = isset($format[0]) ? $format[0] : null;
+        $formatExtension = isset($format[1]) ? $format[1] : null;
 
-        if( ($formatType == 'video' && in_array($formatExtension, $this->VIDEO_EXTENSIONS)) || in_array($urlExtension, $this->VIDEO_EXTENSIONS)) {
+        if (($formatType == 'video' && in_array($formatExtension, $this->VIDEO_EXTENSIONS)) || in_array($urlExtension, $this->VIDEO_EXTENSIONS)) {
             $track->addTag('display');
             $track->setOnlyAudio(false);
-        }
-        else if( ($formatType == 'audio' && in_array($formatExtension, $this->AUDIO_EXTENSIONS)) || in_array($urlExtension, $this->AUDIO_EXTENSIONS)) {
+        } elseif (($formatType == 'audio' && in_array($formatExtension, $this->AUDIO_EXTENSIONS)) || in_array($urlExtension, $this->AUDIO_EXTENSIONS)) {
             $track->addTag('display');
             $track->setOnlyAudio(true);
-        }
-        else {
+        } else {
             //We try to create an embed Url. If we can't, it returns false and we'll redirect instead. (When other repositories provides more embedded urls we will change this)
             $embedUrl = $this->feedProcesser->getEmbedUrl($url);
 
-            if($embedUrl) {
+            if ($embedUrl) {
                 $mmobj->setProperty('opencast', true); //Workaround to prevent editing the Schema Filter for now.
                 $mmobj->setProperty('iframeable', true);
                 $mmobj->setProperty('iframe_url', $embedUrl);
-            }
-            else {
+            } else {
                 $mmobj->setProperty('opencast', true); //Workaround to prevent editing the Schema Filter for now.
                 $mmobj->setProperty('redirect', true);
                 $mmobj->setProperty('redirect_url', $url);
@@ -412,34 +430,34 @@ class FeedSyncService
         if (0 === count($pics)) {
             $mmobj = $this->mmsPicService->addPicUrl($mmobj, $url, false);
         } else {
-            foreach($pics as $pic) break; //Woraround to get the first element.
+            foreach ($pics as $pic) {
+                break;
+            } //Woraround to get the first element.
             $pic->setUrl($url);
             $this->dm->persist($pic);
         }
     }
 
-    /**
-     * Prints on screen an estimated duration of the script and statistics about its execution.
-     *
-     */
+/**
+ * Prints on screen an estimated duration of the script and statistics about its execution.
+ */
     //TODO USE Symfony Progress Bar: http://symfony.com/doc/current/components/console/helpers/progressbar.html
     protected function showProgressEstimateDuration($time_started, $processed, $total, $progressBar = null)
     {
-        $now         = microtime(true);
-        $origin      = $time_started;
+        $now = microtime(true);
+        $origin = $time_started;
         $elapsed_sec = (float) ($now - $origin);
-        $eta_sec     = ($total * $elapsed_sec) / $processed;
-        $eta_min     = $eta_sec / 60;
+        $eta_sec = ($total * $elapsed_sec) / $processed;
+        $eta_min = $eta_sec / 60;
         $elapsed_min = $elapsed_sec / 60;
         $processed_min = (integer) ($processed / $elapsed_min);
-        if(isset($progressBar)){
+        if (isset($progressBar)) {
             $progressBar->setProgress($processed);
-        }
-        else {
-            echo "\nTerena entry " . $processed . " / " . $total . "\n";
-            echo "Elapsed time: " . sprintf('%.2F', $elapsed_min) .
-                 " minutes - estimated: " . sprintf('%.2F', $eta_min) .
-                 " minutes. Speed: " . $processed_min . " terenas / minute.\n";
+        } else {
+            echo "\nTerena entry ".$processed.' / '.$total."\n";
+            echo 'Elapsed time: '.sprintf('%.2F', $elapsed_min).
+                 ' minutes - estimated: '.sprintf('%.2F', $eta_min).
+                 ' minutes. Speed: '.$processed_min." terenas / minute.\n";
         }
     }
 
@@ -448,32 +466,30 @@ class FeedSyncService
      */
     public function syncRepos($output, $optWall, $show_bar, $reposDir)
     {
-
-        if(!$reposDir) {
+        if (!$reposDir) {
             $reposDir = $this->dataFolder->locateResource('@PumukitGeantWebTVBundle/Resources/data/repos_data');
         }
-        $providers = $this->tagRepo->findOneBy(array('cod'=>'PROVIDER'))->getChildren();
+        $providers = $this->tagRepo->findOneBy(array('cod' => 'PROVIDER'))->getChildren();
         $defaultThumbnail = 'bundles/pumukitgeantwebtv/images/repositories/default_picture.png';
-        
+
         //Progress bar init.
         $total = count($providers);
         $progressBar = new ProgressBar($output, $total);
         $progressBar->setFormat("<comment>%message%</comment>\n%current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%");
         $progressBar->setMessage(' Loading repos metadata');
         $progressBar->start();
-                
-        foreach($providers as $provider) {
-            $fileDir = $reposDir."/".$provider->getCod().".json";
-            if(file_exists($fileDir)) {
+
+        foreach ($providers as $provider) {
+            $fileDir = $reposDir.'/'.$provider->getCod().'.json';
+            if (file_exists($fileDir)) {
                 $str = file_get_contents($fileDir);
                 $providerData = json_decode($str, true);
                 $provider->setProperty('description', $providerData['description']);
                 $provider->setTitle($providerData['title']);
                 $thumbnailUrl = $this->parseThumbnailUrl($providerData['thumbnail_url']);
                 $provider->setProperty('thumbnail_url', $thumbnailUrl);
-            }
-            else {
-                $provider->setProperty('description','');
+            } else {
+                $provider->setProperty('description', '');
                 $provider->setProperty('thumbnail_url', $defaultThumbnail);
                 $provider->setTitle($provider->getCod());
             }
@@ -484,11 +500,40 @@ class FeedSyncService
         $output->writeln("\nALL LOADED\n");
         $this->dm->flush();
     }
+
     protected function parseThumbnailUrl($thumbUrl)
     {
-        if(strpos($thumbUrl, 'http') !== false)
+        if (strpos($thumbUrl, 'http') !== false) {
             return $thumbUrl;
-        else
+        } else {
             return '/bundles/pumukitgeantwebtv/images/repositories/'.$thumbUrl;
+        }
+    }
+
+    /**
+     * Helper function that prints the results logged on the $loggedResults array.
+     */
+    protected function printLoggedResults($loggedResults, $output)
+    {
+        $output->writeln('---------');
+        $output->writeln('-------- IMPORTED OBJECTS STATISTICS --------');
+        $output->writeln('Total Providers: '.count($loggedResults));
+        $allObjects = 0;
+        foreach ($loggedResults as $name => $result) {
+            $failedNumber = count($result['failed']);
+            $totalNumber = $result['total'];
+            $successNumber = $totalNumber - $failedNumber;
+            $successPercentage = ($successNumber / $totalNumber) * 100;
+            $output->writeln(sprintf(' - %s: %01.2f%% of Objects were added.  (%s/%s Objects)', $name, $successPercentage, $successNumber, $totalNumber));
+        }
+        $output->writeln(' -------- DETAILED RESULTS: --------');
+        foreach ($loggedResults as $name => $result) {
+            $output->writeln(' .......... '.$name.' .......... ');
+            foreach ($result['failed'] as $error) {
+                $output->writeln(sprintf(' - %s: ', $error));
+            }
+            $output->writeln(' ................. ');
+        }
+        $output->writeln('-------------');
     }
 }
