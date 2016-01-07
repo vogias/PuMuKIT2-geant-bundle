@@ -1,5 +1,5 @@
 ##How to add a new JSON file with your repository data##
-* Create a json file with the name of your repository. (E.g. CAMPUSDOMAR.json)
+* Create a json file with the name of your repository. (E.g. VIGO.json)
 * Add the ***title***, ***description*** and ***thumbnail_url*** tags to your json file.
 
 Example:
