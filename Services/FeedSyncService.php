@@ -93,6 +93,8 @@ class FeedSyncService
                 $this->dm->clear();
             }
         }
+        $this->dm->flush();
+        $this->dm->clear();
         $output->writeln(sprintf('Number of blocked mmobjs: %s', $count));
         $output->writeln('...Blocking empty tags...');
         $providerTags = $this->providerRootTag->getChildren();
