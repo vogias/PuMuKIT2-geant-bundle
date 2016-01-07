@@ -93,6 +93,8 @@ class FeedSyncService
                 $this->dm->clear();
             }
         }
+        $this->dm->flush();
+        $this->dm->clear();
         $output->writeln(sprintf('Number of blocked mmobjs: %s', $count));
         $output->writeln('...Blocking empty tags...');
         $providerTags = $this->providerRootTag->getChildren();
@@ -159,9 +161,9 @@ class FeedSyncService
             $providerCode = $terena['set'];
             //Initializes the provider log.
             if (!isset($loggedResults[$providerCode])) {
-                $loggedResults[$providerCode] = array();
-                $loggedResults[$providerCode]['total'] = 0;
-                $loggedResults[$providerCode]['failed'] = array();
+                $loggedResults[$providerCode] = array(
+                    'total' => 0,
+                    'failed' => array());
             }
             //We increase the number of objects on the log for this repository:
             ++$loggedResults[$providerCode]['total'];
