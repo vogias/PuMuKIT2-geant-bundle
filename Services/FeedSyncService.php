@@ -53,6 +53,7 @@ class FeedSyncService
         $this->dataFolder = $dataFolder;
         $this->init();
     }
+
     public function init()
     {
         $this->seriesRepo = $this->dm->getRepository('PumukitSchemaBundle:Series');
@@ -466,16 +467,25 @@ class FeedSyncService
     /**
      *
      */
-    public function syncRepos($output, $optWall, $show_bar, $reposDir)
+    public function syncRepos($output, $optWall, $show_bar, $reposDir = null)
     {
         if (!$reposDir) {
             $reposDir = $this->dataFolder->locateResource('@PumukitGeantWebTVBundle/Resources/data/repos_data');
         }
-        $providers = $this->tagRepo->findOneBy(array('cod' => 'PROVIDER'))->getChildren();
+        $providerTag = $this->tagRepo->findOneBy(array('cod' => 'PROVIDER'));
+        if(!$providerTag) {
+          $output->writeln("<error>PROVIDER tag does not exist</error>");
+          return;
+        }
+        $providers = $providerTag->getChildren();
         $defaultThumbnail = 'bundles/pumukitgeantwebtv/images/repositories/default_picture.png';
 
         //Progress bar init.
         $total = count($providers);
+        if (0 == $total) {
+          $output->writeln("<error>Not providers in DDBB</error>");
+          return;
+        }
         $progressBar = new ProgressBar($output, $total);
         $progressBar->setFormat("<comment>%message%</comment>\n%current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%");
         $progressBar->setMessage(' Loading repos metadata');
