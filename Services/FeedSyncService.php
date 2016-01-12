@@ -300,6 +300,11 @@ class FeedSyncService
         //THUMBNAIL
         $this->syncThumbnail($mmobj, $parsedTerena);
 
+        //Errors
+        if($parsedTerena['geantErrors']) {
+          $mmobj->setProperty('geant_errors', $parsedTerena['geantErrors']);
+        }
+
         //SAVE CHANGES
         $this->dm->persist($mmobj);
         $this->dm->persist($series);

@@ -19,18 +19,25 @@ class FeedProcesserService
         $this->init();
     }
 
-    public function init()
+    private function init()
     {
         //TODO DO I NEED INITS?
     }
 
     public function process( $geantFeedObject )
     {
-        $processedObject = array();
+        $processedObject = array("geantErrors" => array());
         if(empty($geantFeedObject['expressions'])) {
-            throw new FeedSyncException(sprintf('ERROR: The Geant Feed with ID: %s  does not have a playable resource.',$geantFeedObject['identifier']));
+            throw new FeedSyncException(sprintf('ERROR: The Geant Feed with ID: %s  does not have a playable resource.', $geantFeedObject['identifier']));
         }
-        $date = $this->retrieveDate($geantFeedObject);
+
+        try{
+          $date = $this->retrieveDate($geantFeedObject);
+        }catch(FeedSyncException $e) {
+          $date = new \DateTime("1/1/1970");
+          $processedObject["geantErrors"]["date"] = $e->getMessage();
+        }
+
         $lang = $this->retrieveLanguage($geantFeedObject);
 
         $processedObject['lastUpdateDate'] = $this->processDateField($geantFeedObject['lastUpdateDate'], $geantFeedObject);
@@ -41,8 +48,8 @@ class FeedProcesserService
         $processedObject['title'] = $this->retrieveTitle($geantFeedObject, $lang);
         $processedObject['description'] = $this->retrieveDescription($geantFeedObject, $lang);
         $processedObject['keywords'] = $this->retrieveKeywords($geantFeedObject, $lang);
-        $processedObject['public_date'] = $this->processDateField($date, $geantFeedObject);
-        $processedObject['record_date'] = $this->processDateField($date, $geantFeedObject);// or creation date?
+        $processedObject['public_date'] = $date;
+        $processedObject['record_date'] = $date;
         $processedObject['copyright'] = $this->retrieveCopyright($geantFeedObject, $lang);
         $processedObject['license'] = $this->retrieveCopyright($geantFeedObject, $lang);
         $processedObject['track_url'] = isset($geantFeedObject['expressions']['manifestations']['items']['url'])?$geantFeedObject['expressions']['manifestations']['items']['url']:'';
@@ -74,7 +81,7 @@ class FeedProcesserService
         return $processedObject;
     }
 
-    public function retrieveLanguage($geantFeedObject)
+    private function retrieveLanguage($geantFeedObject)
     {
         if(!isset($geantFeedObject['expressions']['language'])) {
             throw new FeedSyncException(sprintf('There is no language (expressions.language) on feed with ID: %s', $geantFeedObject['identifier']));
@@ -91,7 +98,7 @@ class FeedProcesserService
         return $lang;
     }
 
-    public function retrieveDate($geantFeedObject)
+    private function retrieveDate($geantFeedObject)
     {
         $date = null;
         //if it's just one person...
@@ -111,10 +118,10 @@ class FeedProcesserService
         if(!isset($date)){
             throw new FeedSyncException(sprintf('The feed with ID: %s does not have a "date" field', $geantFeedObject['identifier']));
         }
-        return $date;
+        return $this->processDateField($date, $geantFeedObject);
     }
 
-    public function retrieveTitle($geantFeedObject, $lang)
+    private function retrieveTitle($geantFeedObject, $lang)
     {
         if(isset($geantFeedObject['languageBlocks'][$this->DEF_LANG]['title'])) {
             return $geantFeedObject['languageBlocks'][$this->DEF_LANG]['title'];
@@ -132,7 +139,7 @@ class FeedProcesserService
         throw new FeedSyncException(sprintf('There is no languageBlocks.*.title on feed with ID: %s',$geantFeedObject['identifier']));
     }
 
-    public function retrieveDescription($geantFeedObject, $lang)
+    private function retrieveDescription($geantFeedObject, $lang)
     {
         $description = '';
         if(isset($geantFeedObject['languageBlocks'][$this->DEF_LANG]['description'])) {
@@ -151,7 +158,7 @@ class FeedProcesserService
         return $description;
     }
 
-    public function retrieveCopyright($geantFeedObject, $lang)
+    private function retrieveCopyright($geantFeedObject, $lang)
     {
         $copyright = '';
         if(isset($geantFeedObject['rights']['description'][$this->DEF_LANG])) {
@@ -173,7 +180,7 @@ class FeedProcesserService
         return $copyright;
     }
 
-    public function retrieveKeywords($geantFeedObject, $lang)
+    private function retrieveKeywords($geantFeedObject, $lang)
     {
         $keywords = array();
         foreach($geantFeedObject['languageBlocks'] as $langBlock) {
@@ -184,7 +191,7 @@ class FeedProcesserService
         return $keywords;
     }
 
-    public function retrieveTagCodes($geantFeedObject)
+    private function retrieveTagCodes($geantFeedObject)
     {
         $tags = array();
         if(isset($geantFeedObject['tokenBlock']['taxonPaths'])){
@@ -198,7 +205,7 @@ class FeedProcesserService
     /**
     *
     */
-    public function retrievePeople($geantFeedObject)
+    private function retrievePeople($geantFeedObject)
     {
         $people = array();
         if (isset($geantFeedObject['contributors'])) {
@@ -219,7 +226,7 @@ class FeedProcesserService
         return $people;
     }
 
-    public function processDateField($dateString, $geantFeedObject)
+    private function processDateField($dateString, $geantFeedObject)
     {
         try {
             $date = new \DateTime($dateString);
@@ -270,7 +277,7 @@ class FeedProcesserService
     /**
      * Returns false if $url is not a valid youtube url. Otherwise returns int
      */
-    public function isYoutubeUrl($url)
+    private function isYoutubeUrl($url)
     {
         return preg_match('/youtu\.be\/((\w|\-)*)/', $url) ||
                preg_match('/youtube.*(\&|\?)v\=(\w*)/', $url);
@@ -289,7 +296,7 @@ class FeedProcesserService
     /**
      * Returns the embedded url for a youtube video given its url. If it can't parse the youtube id, it returns false.
      */
-    public function getYoutubeEmbedUrl($url)
+    private function getYoutubeEmbedUrl($url)
     {
         $embedUrl = "https://www.youtube.com/embed/";
         if(strpos($url, 'youtu.be')) {
@@ -313,7 +320,7 @@ class FeedProcesserService
     /**
      * Returns the embedded url for a canaluned video given its url. If it can't parse the uned mmobj id, it returns false.
      */
-    public function getUnedEmbedUrl($url)
+    private function getUnedEmbedUrl($url)
     {
         $embedUrl = "https://canal.uned.es/mmobj/iframe/id/";
         $canalUnedUrl ='https://canal.uned.es/mmobj/index/id/';
