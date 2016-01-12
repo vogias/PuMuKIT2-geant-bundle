@@ -32,7 +32,7 @@ class FeedProcesserService
         try {
             $date = $this->retrieveDate($geantFeedObject);
         } catch (FeedSyncException $e) {
-            $date = new \DateTime('1/1/1970');
+            $date = new \DateTime('1/1/1970Z01:00:00Z');
             $processedObject['geantErrors']['date'] = $e->getMessage();
         }
 
