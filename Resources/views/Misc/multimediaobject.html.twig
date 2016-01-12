@@ -38,7 +38,7 @@
                         {% endif %}
                     </div>
                     <div class="date mmobj" 
-                         title="{{object.property('geant_errors').date?"This object's feed didn't have a date field, or it could not be correctly parsed. The epoch date was added.":'' }}"
+                         title="{{object.property('geant_errors').date?"This object's date could not be correctly added.":'' }}"
                          >
                         {{object.recordDate|date("d/m/Y")}}
                       {% if object.property('geant_errors').date %}
