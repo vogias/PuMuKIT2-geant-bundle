@@ -164,7 +164,7 @@ class FeedSyncService
             if (!isset($loggedResults[$providerCode])) {
                 $loggedResults[$providerCode] = array(
                     'total' => 0,
-                    'failed' => array());
+                    'failed' => array(), );
             }
             //We increase the number of objects on the log for this repository:
             ++$loggedResults[$providerCode]['total'];
@@ -301,8 +301,8 @@ class FeedSyncService
         $this->syncThumbnail($mmobj, $parsedTerena);
 
         //Errors
-        if($parsedTerena['geantErrors']) {
-          $mmobj->setProperty('geant_errors', $parsedTerena['geantErrors']);
+        if ($parsedTerena['geantErrors']) {
+            $mmobj->setProperty('geant_errors', $parsedTerena['geantErrors']);
         }
 
         //SAVE CHANGES
@@ -478,9 +478,10 @@ class FeedSyncService
             $reposDir = $this->dataFolder->locateResource('@PumukitGeantWebTVBundle/Resources/data/repos_data');
         }
         $providerTag = $this->tagRepo->findOneBy(array('cod' => 'PROVIDER'));
-        if(!$providerTag) {
-          $output->writeln("<error>PROVIDER tag does not exist</error>");
-          return;
+        if (!$providerTag) {
+            $output->writeln('<error>PROVIDER tag does not exist</error>');
+
+            return;
         }
         $providers = $providerTag->getChildren();
         $defaultThumbnail = 'bundles/pumukitgeantwebtv/images/repositories/default_picture.png';
@@ -488,8 +489,9 @@ class FeedSyncService
         //Progress bar init.
         $total = count($providers);
         if (0 == $total) {
-          $output->writeln("<error>Not providers in DDBB</error>");
-          return;
+            $output->writeln('<error>Not providers in DDBB</error>');
+
+            return;
         }
         $progressBar = new ProgressBar($output, $total);
         $progressBar->setFormat("<comment>%message%</comment>\n%current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%");

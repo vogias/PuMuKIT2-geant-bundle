@@ -15,7 +15,6 @@ class AnnounceService
         $this->mmobjRepo = $this->dm->getRepository('PumukitSchemaBundle:MultimediaObject');
     }
 
-
     public function getLast($limit = 3)
     {
         $mmobjColl = $this->dm->getDocumentCollection('PumukitSchemaBundle:MultimediaObject');
@@ -26,15 +25,15 @@ class AnnounceService
             array('$match' => $filters),
             array('$sort' => array('public_date' => 1)),
             array('$group' => array('_id' => '$series', 'id' => array('$first' => '$_id'))),
-            array('$limit' => $limit), 
+            array('$limit' => $limit),
         );
         $aggregation = $mmobjColl->aggregate($pipeline);
-    
+
         $ids = array();
-        foreach($aggregation as $element) {
-          $ids[] = $element['id'];
+        foreach ($aggregation as $element) {
+            $ids[] = $element['id'];
         }
-        
+
         $queryBuilderMms = $this->mmobjRepo->createStandardQueryBuilder()
             ->addAnd(array('_id' => array('$in' => $ids)))
             ->sort(array('public_date' => -1))
@@ -55,20 +54,21 @@ class AnnounceService
         return $last;
     }
 
-
     public function getLatestUploadsByDates($dateStart, $dateEnd)
     {
         $queryBuilderMms = $this->mmobjRepo->createStandardQueryBuilder()
           ->field('public_date')->range($dateStart, $dateEnd)
           ->sort(array('public_date' => -1));
+
         return $queryBuilderMms->getQuery()->execute()->toArray();
     }
 
     /**
-    * Gets the next latest uploads, starting with the month given and looking 24 months forward.
-    * If not, returns an empty array.
-    * @return array
-    */
+     * Gets the next latest uploads, starting with the month given and looking 24 months forward.
+     * If not, returns an empty array.
+     *
+     * @return array
+     */
     public function getNextLatestUploads($date)
     {
         $counter = 0;
@@ -76,7 +76,7 @@ class AnnounceService
         $dateStart->modify('first day of next month');
         $dateEnd = clone $date;
         $dateEnd->modify('last day of next month');
-        $dateEnd->setTime(23,59,59);
+        $dateEnd->setTime(23, 59, 59);
         do {
             ++$counter;
             $dateStart->modify('first day of last month');
