@@ -267,7 +267,8 @@ class FeedSyncService
         } else {
             $feedUpdatedDate = $mmobj->getProperty('feed_updated_date');
 
-            if (!$feedUpdatedDate || $feedUpdatedDate < $parsedTerena['lastUpdateDate']) {
+            //We will disable this 'improvement' for now. We can consider to add it with an optional parameter on the future.
+            /*if (!$feedUpdatedDate || $feedUpdatedDate < $parsedTerena['lastUpdateDate']) {
                 $mmobj->setProperty('feed_updated_date', new \MongoDate($parsedTerena['lastUpdateDate']->getTimestamp()));
             } else {
                 $mmobj->setProperty('last_sync_date', $lastSyncDate);
@@ -276,7 +277,7 @@ class FeedSyncService
                 $this->dm->persist($mmobj);
 
                 return 0;
-            }
+            }*/
         }
 
         $mmobj->setProperty('last_sync_date', $lastSyncDate);
