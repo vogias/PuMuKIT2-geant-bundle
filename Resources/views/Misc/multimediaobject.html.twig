@@ -37,8 +37,13 @@
                         <div style="overflow:hidden;height:1.2em;text-overflow:ellipsis; width:100%;white-space: nowrap;" title="{{object.series.title}}">{{object.series.title}}</div>
                         {% endif %}
                     </div>
-                    <div class="date mmobj">
+                    <div class="date mmobj" 
+                         title="{{object.property('geant_errors').date?"This object's feed didn't have a date field, or it could not be correctly parsed. The epoch date was added.":'' }}"
+                         >
                         {{object.recordDate|date("d/m/Y")}}
+                      {% if object.property('geant_errors').date %}
+                        <span class="glyphicon glyphicon-warning-sign" style="color:orange"></span>
+                      {% endif %}
                     </div>
                     <div class=" mmobj-numviewed">{% set num_viewed = object.numview %}
                         {% transchoice num_viewed %}
