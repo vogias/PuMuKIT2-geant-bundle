@@ -24,7 +24,7 @@ parameters:
     pumukit_web_tv.breadcrumbs_parentweb:
         title: 'GÉANT Association'
         url: 'http://www.geant.org/Pages/Home.aspx'
-    geant.feedsyncservice.baseurl:  'http://83.212.114.48/search/v1/akif/'
+    geant.feedsyncservice.baseurl:  'https://services.oer.geant.org/search/v1/akif/'
     geant.savelogs: false
     
 
