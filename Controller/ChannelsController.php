@@ -89,14 +89,7 @@ class ChannelsController extends Controller
         $minRecordDate = $firstMmobj->getRecordDate()->format('m/d/Y');
         $maxRecordDate = date('m/d/Y');
         // --- Query to get years for the 'Year' select form. ---
-        $searchYears = array();
-        $maxYear = date('Y');
-        $tempYear = $firstMmobj->getRecordDate()->format('Y');
-        while($tempYear <= $maxYear) {
-            $searchYears[] = $tempYear;
-            $tempYear++;
-        }
-
+        $searchYears = $this->getYears();
         // --- RETURN ---
         return array('type' => 'multimediaObject',
             'objects' => $pagerfanta,
@@ -223,4 +216,21 @@ class ChannelsController extends Controller
         return $queryBuilder;
     }
     // ========== END queryBuilder functions =========
+
+    private function getYears()
+    {
+        $mmObjColl = $this->get('doctrine_mongodb')->getManager()->getDocumentCollection('PumukitSchemaBundle:MultimediaObject');
+        $pipeline = array(
+            array('$match' => array('status' => MultimediaObject::STATUS_PUBLISHED)),
+            array('$group' => array('_id' => array('$year' => '$record_date'))),
+            array('$sort' => array('_id' => 1)),
+        );
+        $yearResults = $mmObjColl->aggregate($pipeline);
+        $years = array();
+        foreach($yearResults as $year) {
+            $years[] = $year['_id'];
+        }
+        return $years;
+    }
+
 }
