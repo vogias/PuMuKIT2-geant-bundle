@@ -6,7 +6,8 @@
 {% set has_date_error = object.property('geant_errors') ? (object.property('geant_errors').date ? true : false) : false%}
 
 <div class="{{ col_class }}">
-    <a href="{{ path('pumukit_webtv_multimediaobject_index', {'id': object.id}) }}">
+
+    <a href="{{ path('pumukit_webtv_multimediaobject_index', {'id': object.id}) }}" target="{{object.getProperty('redirect')?"_blank":"_self"}}">
         <div class="pumukit_mmobj">
             <div class="thumbnail">
               {% if object.durationString == "0''" %}
