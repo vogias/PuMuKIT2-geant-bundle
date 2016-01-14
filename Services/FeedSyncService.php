@@ -320,7 +320,6 @@ class FeedSyncService
         }
         $mmobj->setLicense($parsedTerena['license']);
         $mmobj->setCopyright($parsedTerena['copyright']);
-        $mmobj->setPublicDate($parsedTerena['public_date']);
         $mmobj->setRecordDate($parsedTerena['record_date']);
         $mmobj->setDuration($parsedTerena['duration']);
     }
