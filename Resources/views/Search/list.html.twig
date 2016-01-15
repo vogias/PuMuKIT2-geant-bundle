@@ -3,6 +3,7 @@
   {% set lastDate = '--' %}
   {% set lastSubserialTitle = 0 %}
 <br>
+
   <div class="col-xs-12">
     {% if type == 'series' %}
       {% include 'PumukitWebTVBundle:Search:filtersseries.html.twig' %}
@@ -11,10 +12,11 @@
     {% endif %}
   </div>
 <div style="clear:both">{# PREVENTS MMOBJS FROM EXTENDING TO TOP #}</div>
+<p style="padding-left:15px;color:black;font-weight:bold;font-size:1.2em;">{% trans %}Total search results: {% endtrans %}{{total_objects}}</p>
   {% for object in objects %}
     {% if object.isCollection() %}
       {% include 'PumukitWebTVBundle:Misc:series.html.twig' with{ 'cols': number_cols } %}
-      {% set lastDate = object.getPublicDate()|date("Y") %}
+      {% set lastDate = object.getRecordDate()|date("Y") %}
     {% else %}
     {% if object.getRecordDate()|date("Y") != lastDate %}
     <div style="clear:both;"></div>
@@ -24,7 +26,7 @@
     </h2>
     {% endif %}
       {% include 'PumukitWebTVBundle:Misc:multimediaobject.html.twig' with{ 'cols': number_cols } %}
-      {% set lastDate = object.getPublicDate()|date("Y") %}
+      {% set lastDate = object.getRecordDate()|date("Y") %}
     {% endif %}
     {% else %}
     <div class="main_menu_text text-center">
