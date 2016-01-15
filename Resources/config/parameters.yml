@@ -14,7 +14,7 @@ parameters:
     search.parent_tag.cod:     ITUNESU               # Search controller option for the main tag search.
     search.parent_tag_2.cod:     PROVIDER            # Search controller option for the optional tag search.
 
-    breadcrumbs_home_title:  'OER Portal'            # 'Home' option title for the breadcrumbs service.
+    breadcrumbs_home_title:  'eduOER Portal'            # 'Home' option title for the breadcrumbs service.
     menu.home_title:  'Home'                         # 'Home' option title for the menu widget.
     menu.announces_title:  'Latest Uploads'          # 'Announces' option title for the menu widget.
     menu.search_title:  'Search'                     # 'Search' option title for the menu widget.
@@ -24,7 +24,7 @@ parameters:
     pumukit_web_tv.breadcrumbs_parentweb:
         title: 'GÉANT Association'
         url: 'http://www.geant.org/Pages/Home.aspx'
-    geant.feedsyncservice.baseurl:  'http://83.212.114.48/search/v1/akif/'
+    geant.feedsyncservice.baseurl:  'https://services.oer.geant.org/search/v1/akif/'
     geant.savelogs: false
     
 
