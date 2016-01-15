@@ -63,6 +63,9 @@ class ChannelsController extends Controller
         $queryBuilder = $this->languageQueryBuilder($queryBuilder, $languageFound);
         $queryBuilder = $this->tagsQueryBuilder($queryBuilder, $tagsFound);
         // --- END Create QueryBuilder ---
+        // --- Execute QueryBuilder count --
+        $countQuery = clone $queryBuilder;
+        $totalObjects = $countQuery->count()->getQuery()->execute();
         // --- Execute QueryBuilder and get paged results ---
         $pagerfanta = $this->createPager($queryBuilder, $request->query->get('page', 1));
         // --- Query to get existing languages ---
@@ -100,7 +103,7 @@ class ChannelsController extends Controller
             'languages' => $searchLanguages,
             'blocked_tag' => $tag,
             'search_years' => $searchYears,
-        );
+            'total_objects' => $totalObjects);
     }
 
     private function createPager($objects, $page)
