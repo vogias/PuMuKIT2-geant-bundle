@@ -35,7 +35,7 @@ class FeedSyncService
     private $webTVTag;
     private $optWall; //If true, prints warnings.
 
-    private $VIDEO_EXTENSIONS = array('mp4', 'm4v', 'm4b');
+    private $VIDEO_EXTENSIONS = array('mp4', 'm4v', 'm4b', 'flv');
     private $AUDIO_EXTENSIONS = array('mp3', 'm4a', 'wav', 'ogg');
 
     public function __construct(FactoryService $factoryService, TagService $tagService, PersonService $personService, MultimediaObjectPicService $mmsPicService, FeedSyncClientService $feedClientService,
@@ -413,9 +413,13 @@ class FeedSyncService
         if (($formatType == 'video' && in_array($formatExtension, $this->VIDEO_EXTENSIONS)) || in_array($urlExtension, $this->VIDEO_EXTENSIONS)) {
             $track->addTag('display');
             $track->setOnlyAudio(false);
+            $mmobj->setProperty('redirect', false);
+            $mmobj->setProperty('iframeable', false);
         } elseif (($formatType == 'audio' && in_array($formatExtension, $this->AUDIO_EXTENSIONS)) || in_array($urlExtension, $this->AUDIO_EXTENSIONS)) {
             $track->addTag('display');
             $track->setOnlyAudio(true);
+            $mmobj->setProperty('redirect', false);
+            $mmobj->setProperty('iframeable', false);
         } else {
             //We try to create an embed Url. If we can't, it returns false and we'll redirect instead. (When other repositories provides more embedded urls we will change this)
             $embedUrl = $this->feedProcesser->getEmbedUrl($url);
@@ -423,10 +427,12 @@ class FeedSyncService
             if ($embedUrl) {
                 $mmobj->setProperty('opencast', true); //Workaround to prevent editing the Schema Filter for now.
                 $mmobj->setProperty('iframeable', true);
+                $mmobj->setProperty('redirect', false);
                 $mmobj->setProperty('iframe_url', $embedUrl);
             } else {
                 $mmobj->setProperty('opencast', true); //Workaround to prevent editing the Schema Filter for now.
                 $mmobj->setProperty('redirect', true);
+                $mmobj->setProperty('iframeable', false);
                 $mmobj->setProperty('redirect_url', $url);
             }
         }
