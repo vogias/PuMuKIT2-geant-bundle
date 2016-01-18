@@ -46,6 +46,10 @@ class CatalogueController extends Controller
                 }
             }
         }
+        //Sort by title. (It could also be done on mongo)
+        usort($repositories, function($a, $b) {
+            return $a['title'] > $b['title'];
+        });
         return array('provider_tags' => $repositories);
     }
 }
