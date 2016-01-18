@@ -1,67 +1,75 @@
+<div class='fancy-header' align="center">
+	<br>
+	<h2><b>Welcome to the edu<font color="#e81657">OER</font> Portal</h2>
+	<p align="center" class="lead">
+		<h3>{% trans %} Here, educators and students can find educational
+			multimedia content across diverse resources, disc​iplines and
+			countries. {% endtrans %} </h3>
+	</p>
+
+</div>
+<br>
+
+
 <h1>{% trans %} Channels {% endtrans %}</h1>
 <div class="index_widget row">
-  {# ROW 1 #}
-  <div class="index_container col-md-4 col-sm-6" >
-    <div class="img_category">
-      {% set title = "Health and Medicine" %}
-      <a href="{{ path('pumukit_geant_webtv_channels_multimediaobjects', {'category': 1 }) }}">
-        <img alt="{{ title | trans }}" src="{{ asset('bundles/pumukitgeantwebtv/images/0.jpg') }}" />
-        <span class="cover">
-          <div>
-            {{ title | trans }}
-          </div>
-        </span>
-      </a>
-    </div>
-    <div class="img_category two" >
-      {% set title = "Humanities" %}
-      <a href="{{ path('pumukit_geant_webtv_channels_multimediaobjects', {'category': 2  }) }}">
-        <img alt="{{ title | trans }}" src="{{ asset('bundles/pumukitgeantwebtv/images/1.jpg') }}" />
-        <span class="cover">
-          <div>
-            {{ title | trans }}
-          </div>
-        </span>
-      </a>
-    </div>
-  </div>
-  {# ROW 2 #}
-  <div class="index_container col-md-4 col-sm-6">
-    <div class="img_category two" >
-      {% set title = "Legal and Social" %}
-      <a href="{{ path('pumukit_geant_webtv_channels_multimediaobjects', {'category': 5 }) }}">
-        <img alt="{{ title | trans }}" src="{{ asset('bundles/pumukitgeantwebtv/images/2.jpg') }}" />
-        <span class="cover">
-          <div>
-            {{ title | trans }}
-          </div>
-        </span>
-      </a>
-    </div>
-    <div class="img_category two" >
-      {% set title = "Science" %}
-      <a href="{{ path('pumukit_geant_webtv_channels_multimediaobjects', {'category': 3 }) }}">
-        <img alt="{{ title | trans }}" src="{{ asset('bundles/pumukitgeantwebtv/images/3.jpg') }}" />
-        <span class="cover">
-          <div>
-            {{ title | trans }}
-          </div>
-        </span>
-      </a>
-    </div>
-  </div>
-  {# ROW 3 #}
-  <div class="index_container col-md-4 col-sm-6" >
-    <div class="img_category two" >
-      {% set title = "Technology" %}
-      <a href="{{ path('pumukit_geant_webtv_channels_multimediaobjects', {'category': 4 }) }}">
-        <img alt="{{ title | trans }}" src="{{ asset('bundles/pumukitgeantwebtv/images/4.jpg') }}" />
-        <span class="cover">
-          <div>
-            {{ title | trans }}
-          </div>
-        </span>
-      </a>
-    </div>
-  </div>
+	{# ROW 1 #}
+	<div class="index_container col-md-4 col-sm-6">
+		<div class="img_category">
+			{% set title = "Health and Medicine" %} <a
+				href="{{ path('pumukit_geant_webtv_channels_multimediaobjects', {'category': 1 }) }}">
+				<img alt="{{ title | trans }}"
+				src="{{ asset('bundles/pumukitgeantwebtv/images/0.jpg') }}" /> <span
+				class="cover">
+					<div>{{ title | trans }}</div>
+			</span>
+			</a>
+		</div>
+		<div class="img_category two">
+			{% set title = "Humanities" %} <a
+				href="{{ path('pumukit_geant_webtv_channels_multimediaobjects', {'category': 2  }) }}">
+				<img alt="{{ title | trans }}"
+				src="{{ asset('bundles/pumukitgeantwebtv/images/1.jpg') }}" /> <span
+				class="cover">
+					<div>{{ title | trans }}</div>
+			</span>
+			</a>
+		</div>
+	</div>
+	{# ROW 2 #}
+	<div class="index_container col-md-4 col-sm-6">
+		<div class="img_category two">
+			{% set title = "Legal and Social" %} <a
+				href="{{ path('pumukit_geant_webtv_channels_multimediaobjects', {'category': 5 }) }}">
+				<img alt="{{ title | trans }}"
+				src="{{ asset('bundles/pumukitgeantwebtv/images/2.jpg') }}" /> <span
+				class="cover">
+					<div>{{ title | trans }}</div>
+			</span>
+			</a>
+		</div>
+		<div class="img_category two">
+			{% set title = "Science" %} <a
+				href="{{ path('pumukit_geant_webtv_channels_multimediaobjects', {'category': 3 }) }}">
+				<img alt="{{ title | trans }}"
+				src="{{ asset('bundles/pumukitgeantwebtv/images/3.jpg') }}" /> <span
+				class="cover">
+					<div>{{ title | trans }}</div>
+			</span>
+			</a>
+		</div>
+	</div>
+	{# ROW 3 #}
+	<div class="index_container col-md-4 col-sm-6">
+		<div class="img_category two">
+			{% set title = "Technology" %} <a
+				href="{{ path('pumukit_geant_webtv_channels_multimediaobjects', {'category': 4 }) }}">
+				<img alt="{{ title | trans }}"
+				src="{{ asset('bundles/pumukitgeantwebtv/images/4.jpg') }}" /> <span
+				class="cover">
+					<div>{{ title | trans }}</div>
+			</span>
+			</a>
+		</div>
+	</div>
 </div>
