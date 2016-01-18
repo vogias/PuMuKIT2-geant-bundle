@@ -305,6 +305,9 @@ class FeedSyncService
         if ($parsedTerena['geantErrors']) {
             $mmobj->setProperty('geant_errors', $parsedTerena['geantErrors']);
         }
+        else {
+            $mmobj->setProperty('geant_errors', null);
+        }
 
         //SAVE CHANGES
         $this->dm->persist($mmobj);
