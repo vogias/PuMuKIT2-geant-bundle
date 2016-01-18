@@ -1,7 +1,7 @@
 {% set col_mapper = {'1': 'col-md-12', '2': 'col-md-6', '3': 'col-md-4', '4': 'col-md-3'} %}
 {% set col_class = ( col_mapper[cols|default('1')] | default(col_mapper['1'] ) ) %}
 <div class="{{ col_class }} nopadding">
-    <div class="pumukit_mmobj">
+    <div class="pumukit_mmobj pumukit_repository">
         <a href="{{ path_to_tag(tag.cod) }}">
             <figure class="pumukit_album">
                 <div class="thumbnail thumbnailo"><div class="thumbnailholder" ></div><img class="thumbnailimg" src="{{ asset( tag.image_url )}} " /></div>
@@ -23,7 +23,7 @@
               </a>
             </div>
             <div class="description">
-              <div class="hidden-xs" style="overflow:hidden;height:4.2em;">
+              <div class="hidden-xs" style="overflow:hidden;">
                 {{tag.description}}
               </div>
               <div class="visible-xs" style="overflow:hidden;height:5.7em;text-overflow:ellipsis; width:100%;white-space: nowrap;">
