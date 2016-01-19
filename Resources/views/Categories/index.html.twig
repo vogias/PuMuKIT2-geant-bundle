@@ -13,7 +13,7 @@
             {% set count = parent.num_mmobjs %}
             <small>
                 ({% transchoice count %}
-                {0}no resources/recordings yet{1}1 video|]1,Inf[%count% videos
+                {0}no resources/recordings yet|{1}1 video|]1,Inf[%count% videos
                 {% endtranschoice %})
             </small>
         </h2>
@@ -29,7 +29,7 @@
             {% if child.num_mmobjs > 0 %}
             <{{markdown}}>
                 <a href="{{ child.url }}">
-                    {{ child.title }} ({%trans%}{% endtrans %} {{ child.num_mmobjs }})
+                    {{ child.title }} ({{ child.num_mmobjs }})
                 </a>
             </{{markdown}}>
             {% else %}
