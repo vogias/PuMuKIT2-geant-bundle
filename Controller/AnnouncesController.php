@@ -27,12 +27,14 @@ class AnnouncesController extends Controller
 
         $announcesService = $this->get('pumukitschema.announce');
 
-        $last = array();
-        $last = $announcesService->getLast($limit);
+        $lastMms = array();
+        $mmobjRepo = $this->getDoctrine()->getRepository('PumukitSchemaBundle:MultimediaObject');
+        //Get last objects without errors.
+        $lastMms = $mmobjRepo->findStandardBy(array('properties.geant_errors' => array('$exists' => false)), array('public_date' => -1), $limit, 0);
         $numberCols = $this->container->getParameter('columns_objs_announces');
 
         return array('template_title' => $templateTitle,
-                     'last' => $last, 
+                     'last' => $lastMms,
                      'number_cols' => $numberCols );
     }
 }

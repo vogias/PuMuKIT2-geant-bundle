@@ -3,7 +3,6 @@
 namespace Pumukit\Geant\WebTVBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -15,7 +14,7 @@ class SyncFeedGeantCommand extends ContainerAwareCommand
         $this
         ->setName('geant:syncfeed:import')
         ->setDescription('Imports Geant feed and publishes on PuMuKIT.')
-        ->setHelp( $this->getCommandHelpText() )
+        ->setHelp($this->getCommandHelpText())
         ->addOption(
                 'Wall',
                 'W',
@@ -46,7 +45,7 @@ class SyncFeedGeantCommand extends ContainerAwareCommand
                 'b',
                 InputOption::VALUE_NONE,
                 'If set, the task will output a symfony style progress bar.'
-            )    ;
+            );
     }
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -56,22 +55,17 @@ class SyncFeedGeantCommand extends ContainerAwareCommand
         $output->writeln($formattedBlock);
         //EXECUTE SERVICE
         $feedSyncService = $this->getContainer()->get('pumukit_web_tv.geant.feedsync');
-        $optWall = $input->getOption('Wall')?true:false;
-        $limit = $input->getOption('limit')?:0;
+        $optWall = $input->getOption('Wall') ? true : false;
+        $limit = $input->getOption('limit') ?: 0;
         $provider = $input->getOption('provider');
-        $verbose = $input->getOption('showids')?true:false;
-        $show_bar = $input->getOption('show-progress-bar')?true:false;
-        $output->writeln( "\nStarting sync...\n" );
+        $verbose = $input->getOption('showids') ? true : false;
+        $show_bar = $input->getOption('show-progress-bar') ? true : false;
+        $output->writeln("\nStarting sync...\n");
         $startTime = $feedSyncService->sync($output, $limit, $optWall, $provider, $verbose, $show_bar);
         $output->writeln("\nSYNC FINISHED: Blocking Unsynced..");
         $feedSyncService->blockUnsynced($output, $startTime);
         //SHUTDOWN HAPPILY
     }
-
-
-
-
-
 
     protected function getCommandHelpText()
     {
@@ -82,8 +76,6 @@ The --force parameter has to be used to actually drop the database.
 
 EOT;
     }
-
-
 
     protected function getCommandASCIIHeader()
     {

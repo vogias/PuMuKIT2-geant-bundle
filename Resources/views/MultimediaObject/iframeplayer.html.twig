@@ -18,6 +18,13 @@
     <span class="hidden-sm hidden-xs"></br></span>
     <div class="row">
       <div class="col-xs-12">
+        {% if multimediaObject.property('geant_errors').date %}
+          <div class="alert alert-warning">
+            <span class="glyphicon glyphicon-warning-sign" style="color:orange"></span>
+            {{"This object's date could not be correctly added." }}
+          </div>
+        {% endif %}
+
         {% include 'PumukitWebTVBundle:Misc:magic_url_disclaimer.html.twig' %}
         <div class="embed-responsive embed-responsive-16by9">
           <iframe class="embed-responsive-item" src="{{iframe_url}}"></iframe>

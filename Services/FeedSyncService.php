@@ -35,7 +35,7 @@ class FeedSyncService
     private $webTVTag;
     private $optWall; //If true, prints warnings.
 
-    private $VIDEO_EXTENSIONS = array('mp4', 'm4v', 'm4b');
+    private $VIDEO_EXTENSIONS = array('mp4', 'm4v', 'm4b', 'flv');
     private $AUDIO_EXTENSIONS = array('mp3', 'm4a', 'wav', 'ogg');
 
     public function __construct(FactoryService $factoryService, TagService $tagService, PersonService $personService, MultimediaObjectPicService $mmsPicService, FeedSyncClientService $feedClientService,
@@ -53,6 +53,7 @@ class FeedSyncService
         $this->dataFolder = $dataFolder;
         $this->init();
     }
+
     public function init()
     {
         $this->seriesRepo = $this->dm->getRepository('PumukitSchemaBundle:Series');
@@ -163,7 +164,7 @@ class FeedSyncService
             if (!isset($loggedResults[$providerCode])) {
                 $loggedResults[$providerCode] = array(
                     'total' => 0,
-                    'failed' => array());
+                    'failed' => array(), );
             }
             //We increase the number of objects on the log for this repository:
             ++$loggedResults[$providerCode]['total'];
@@ -266,7 +267,8 @@ class FeedSyncService
         } else {
             $feedUpdatedDate = $mmobj->getProperty('feed_updated_date');
 
-            if (!$feedUpdatedDate || $feedUpdatedDate < $parsedTerena['lastUpdateDate']) {
+            //We will disable this 'improvement' for now. We can consider to add it with an optional parameter on the future.
+            /*if (!$feedUpdatedDate || $feedUpdatedDate < $parsedTerena['lastUpdateDate']) {
                 $mmobj->setProperty('feed_updated_date', new \MongoDate($parsedTerena['lastUpdateDate']->getTimestamp()));
             } else {
                 $mmobj->setProperty('last_sync_date', $lastSyncDate);
@@ -275,7 +277,7 @@ class FeedSyncService
                 $this->dm->persist($mmobj);
 
                 return 0;
-            }
+            }*/
         }
 
         $mmobj->setProperty('last_sync_date', $lastSyncDate);
@@ -299,6 +301,14 @@ class FeedSyncService
         //THUMBNAIL
         $this->syncThumbnail($mmobj, $parsedTerena);
 
+        //Errors
+        if ($parsedTerena['geantErrors']) {
+            $mmobj->setProperty('geant_errors', $parsedTerena['geantErrors']);
+        }
+        else {
+            $mmobj->setProperty('geant_errors', null);
+        }
+
         //SAVE CHANGES
         $this->dm->persist($mmobj);
         $this->dm->persist($series);
@@ -313,7 +323,6 @@ class FeedSyncService
         }
         $mmobj->setLicense($parsedTerena['license']);
         $mmobj->setCopyright($parsedTerena['copyright']);
-        $mmobj->setPublicDate($parsedTerena['public_date']);
         $mmobj->setRecordDate($parsedTerena['record_date']);
         $mmobj->setDuration($parsedTerena['duration']);
     }
@@ -404,9 +413,13 @@ class FeedSyncService
         if (($formatType == 'video' && in_array($formatExtension, $this->VIDEO_EXTENSIONS)) || in_array($urlExtension, $this->VIDEO_EXTENSIONS)) {
             $track->addTag('display');
             $track->setOnlyAudio(false);
+            $mmobj->setProperty('redirect', false);
+            $mmobj->setProperty('iframeable', false);
         } elseif (($formatType == 'audio' && in_array($formatExtension, $this->AUDIO_EXTENSIONS)) || in_array($urlExtension, $this->AUDIO_EXTENSIONS)) {
             $track->addTag('display');
             $track->setOnlyAudio(true);
+            $mmobj->setProperty('redirect', false);
+            $mmobj->setProperty('iframeable', false);
         } else {
             //We try to create an embed Url. If we can't, it returns false and we'll redirect instead. (When other repositories provides more embedded urls we will change this)
             $embedUrl = $this->feedProcesser->getEmbedUrl($url);
@@ -414,10 +427,12 @@ class FeedSyncService
             if ($embedUrl) {
                 $mmobj->setProperty('opencast', true); //Workaround to prevent editing the Schema Filter for now.
                 $mmobj->setProperty('iframeable', true);
+                $mmobj->setProperty('redirect', false);
                 $mmobj->setProperty('iframe_url', $embedUrl);
             } else {
                 $mmobj->setProperty('opencast', true); //Workaround to prevent editing the Schema Filter for now.
                 $mmobj->setProperty('redirect', true);
+                $mmobj->setProperty('iframeable', false);
                 $mmobj->setProperty('redirect_url', $url);
             }
         }
@@ -466,16 +481,27 @@ class FeedSyncService
     /**
      *
      */
-    public function syncRepos($output, $optWall, $show_bar, $reposDir)
+    public function syncRepos($output, $optWall, $show_bar, $reposDir = null)
     {
         if (!$reposDir) {
             $reposDir = $this->dataFolder->locateResource('@PumukitGeantWebTVBundle/Resources/data/repos_data');
         }
-        $providers = $this->tagRepo->findOneBy(array('cod' => 'PROVIDER'))->getChildren();
+        $providerTag = $this->tagRepo->findOneBy(array('cod' => 'PROVIDER'));
+        if (!$providerTag) {
+            $output->writeln('<error>PROVIDER tag does not exist</error>');
+
+            return;
+        }
+        $providers = $providerTag->getChildren();
         $defaultThumbnail = 'bundles/pumukitgeantwebtv/images/repositories/default_picture.png';
 
         //Progress bar init.
         $total = count($providers);
+        if (0 == $total) {
+            $output->writeln('<error>Not providers in DDBB</error>');
+
+            return;
+        }
         $progressBar = new ProgressBar($output, $total);
         $progressBar->setFormat("<comment>%message%</comment>\n%current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%");
         $progressBar->setMessage(' Loading repos metadata');
