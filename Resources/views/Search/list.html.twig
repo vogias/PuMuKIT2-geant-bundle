@@ -1,5 +1,4 @@
 <div>
-
   {% set lastDate = '--' %}
   {% set lastSubserialTitle = 0 %}
   <br>
@@ -11,24 +10,30 @@
     {% endif %}
   </div>
   <div style="clear:both">{# PREVENTS MMOBJS FROM EXTENDING TO TOP #}</div>
-  {% for object in objects %}
-    {% if object.isCollection() %}
-      {% include 'PumukitWebTVBundle:Misc:series.html.twig' with{ 'cols': number_cols } %}
-      {% set lastDate = object.getRecordDate()|date("Y") %}
-    {% else %}
-      {% if object.getRecordDate()|date("Y") != lastDate %}
-        <div style="clear:both;"></div>
-        <br/>
-        <h2 class="search_group_date">
-          {{ object.getRecordDate()|date("Y") }}
-        </h2>
+  <div id="search_results">
+    <p style="padding-left:15px;color:black;font-weight:bold;font-size:1.2em;">{% trans %}Total search results: {% endtrans %}{{total_objects}}</p>
+    {% for object in objects %}
+      {% if object.isCollection() %}
+        {% include 'PumukitWebTVBundle:Misc:series.html.twig' with{ 'cols': number_cols } %}
+        {% set lastDate = object.getRecordDate()|date("Y") %}
+      {% else %}
+        {% if object.getRecordDate()|date("Y") != lastDate %}
+          <div style="clear:both;"></div>
+          <br />
+          <h2 class="search_group_date">
+            {{ object.getRecordDate()|date("Y") }}
+          </h2>
+        {% endif %}
+        {% include 'PumukitWebTVBundle:Misc:multimediaobject.html.twig' with{ 'cols': number_cols } %}
+        {% set lastDate = object.getRecordDate()|date("Y") %}
       {% endif %}
-      {% include 'PumukitWebTVBundle:Misc:multimediaobject.html.twig' with{ 'cols': number_cols } %}
-      {% set lastDate = object.getRecordDate()|date("Y") %}
-    {% endif %}
     {% else %}
-    <div class="main_menu_text text-center">
-      {% trans %}No resources found{% endtrans %}
-    </div>
-  {% endfor %}
+      <div class="main_menu_text text-center">
+        {% trans %}No resources found{% endtrans %}
+      </div>
+    {% endfor %}
+  </div>
+  <div id="search_spinner" style="display:none;text-align:center;">
+    <img src="{{ asset('bundles/pumukitgeantwebtv/images/spinner.gif') }}"/>
+  </div>
 </div>
