@@ -20,6 +20,9 @@ class MultimediaObjectController extends ParentController
             if (!$redirectUrl) {
                 throw $this->createNotFoundException();
             }
+            if(!strpos('://',$redirectUrl)) {
+                $redirectUrl = "http://".$redirectUrl;
+            }
             return $this->redirect($redirectUrl);
         }
     }
