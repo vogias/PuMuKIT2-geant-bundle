@@ -251,7 +251,7 @@ class FeedSyncService
         if (!isset($mmobj)) {
             $mmobj = $factory->createMultimediaObject($series, false);
             $mmobj->setProperty('geant_id', $parsedTerena['identifier']);
-
+            $mmobj->setProperty('feed_updated_date', $parsedTerena['lastUpdateDate']);
             //Add 'provider' tag
             $providerTag = $this->tagRepo->findOneByCod($parsedTerena['provider']);
             if (!isset($providerTag)) {
@@ -264,22 +264,9 @@ class FeedSyncService
                 $this->dm->persist($providerTag);
             }
             $this->tagService->addTagToMultimediaObject($mmobj, $providerTag->getId(), false);
-        } else {
-            $feedUpdatedDate = $mmobj->getProperty('feed_updated_date');
-
-            //We will disable this 'improvement' for now. We can consider to add it with an optional parameter on the future.
-            /*if (!$feedUpdatedDate || $feedUpdatedDate < $parsedTerena['lastUpdateDate']) {
-                $mmobj->setProperty('feed_updated_date', new \MongoDate($parsedTerena['lastUpdateDate']->getTimestamp()));
-            } else {
-                $mmobj->setProperty('last_sync_date', $lastSyncDate);
-                $series->setProperty('last_sync_date', $lastSyncDate);
-                $mmobj->setStatus(MultimediaObject::STATUS_PUBLISHED);
-                $this->dm->persist($mmobj);
-
-                return 0;
-            }*/
         }
 
+        $mmobj->setProperty('feed_updated_date', $parsedTerena['lastUpdateDate']);
         $mmobj->setProperty('last_sync_date', $lastSyncDate);
         $series->setProperty('last_sync_date', $lastSyncDate);
         //PUBLISH
