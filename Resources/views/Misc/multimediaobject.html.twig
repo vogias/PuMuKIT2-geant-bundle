@@ -1,3 +1,11 @@
+<script>
+$(document).ready(function()
+{
+    $(".thumbnailimg").error(function(){
+        $(this).attr('src', '{{asset('bundles/pumukitgeantwebtv/images/no_image.jpg')}}');
+    });
+});
+</script>
 <!--Objeto multimedia-->
 {% set col_mapper = {'1': 'col-md-12', '2': 'col-md-6', '3': 'col-md-4', '4': 'col-md-3'} %}
 {% set col_class = ( col_mapper[cols|default('1')] | default(col_mapper['1'] ) ) %}
@@ -15,7 +23,7 @@
               {% else %}
                 <span class="video-duration">{{ object.durationString }}</span>
               {% endif %}
-                <img alt="serial_pic" class="serial thumbnailimg" src="{{ object|first_url_pic(true) }}"/>
+                <img alt="serial_pic" class="serial thumbnailimg" src="{{ object|first_url_pic(true) }}a"/>
                 <div class="thumbnailholder" ></div>
             </div>
             <div class="info-wrapper">
