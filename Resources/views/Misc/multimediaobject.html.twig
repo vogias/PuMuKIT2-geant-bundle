@@ -23,7 +23,7 @@ $(document).ready(function()
               {% else %}
                 <span class="video-duration">{{ object.durationString }}</span>
               {% endif %}
-                <img alt="serial_pic" class="serial thumbnailimg" src="{{ object|first_url_pic(true) }}a"/>
+                <img alt="serial_pic" class="serial thumbnailimg" src="{{ object|first_url_pic(true) }}"/>
                 <div class="thumbnailholder" ></div>
             </div>
             <div class="info-wrapper">
