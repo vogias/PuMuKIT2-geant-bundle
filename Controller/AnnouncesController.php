@@ -30,7 +30,7 @@ class AnnouncesController extends Controller
         $lastMms = array();
         $mmobjRepo = $this->getDoctrine()->getRepository('PumukitSchemaBundle:MultimediaObject');
         //Get last objects without errors.
-        $lastMms = $mmobjRepo->findStandardBy(array('properties.geant_errors' => array('$exists' => false)), array('public_date' => -1), $limit, 0);
+        $lastMms = $mmobjRepo->findStandardBy(array('properties.geant_errors' => null), array('public_date' => -1), $limit, 0);
         $numberCols = $this->container->getParameter('columns_objs_announces');
 
         return array('template_title' => $templateTitle,
