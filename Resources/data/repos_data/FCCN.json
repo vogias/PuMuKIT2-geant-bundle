@@ -1,5 +1,6 @@
 {
     "title": "FCCN Educast Repository",
-    "description": "FCCN Educast Repository description goes here.",
+    "description": "Educast is a lecture recording service that allows to record, edit and publish classes and other institutional events on the web.
+This solution is comprised of a central repository for storing and processing videos, online content editing and recording software. The platform is supported by FCT-FCCN and is aimed to students, teachers and researchers.",
     "thumbnail_url": "FCCN.png"
 }
