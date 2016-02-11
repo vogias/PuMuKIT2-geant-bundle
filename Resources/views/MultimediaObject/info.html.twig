@@ -1,0 +1,46 @@
+<!--INFO-->
+<!--Multimedia object tags-->
+<div class="row">{% include
+	'PumukitWebTVBundle:MultimediaObject:tags.html.twig' %}</div>
+<!--VIEWED/DATE-->
+<div class="row">
+	<div class="col-xs-12">
+		<div class="date">{% trans %}Recording date{% endtrans %}: {{
+			multimediaObject.getRecordDate().format("d/m/Y") }}</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-xs-12">
+		<div class="num_views">{% trans %}Viewed{% endtrans %}: {{
+			multimediaObject.getNumview() }} {% if multimediaObject.getNumview()
+			> 1 %} {% trans %} times {% endtrans %} {% else %} {% trans %} time
+			{% endtrans %} {% endif %}</div>
+	</div>
+</div>
+<!--SUBTITLE/DESCRIPTION-->
+<div class="row">
+	<div class="col-xs-12">
+		<div class="mmobj-title">
+			<h4>{{ multimediaObject.getSubtitle() }}</h4>
+		</div>
+		<p class="description">{{ multimediaObject.getDescription() }}</p>
+	</div>
+</div>
+<div class="row">
+	<div class="col-xs-12">		
+		<!-- PERSONS ACT -->
+		<div class="persons">
+			{% for role in multimediaObject.getRoles() if role.getDisplay() %} {%
+			for person in multimediaObject.getPeopleByRole(role) %}
+			<div>
+				<div class="person">
+					<span class="glyphicon glyphicon-user"></span> {{ role.getText() }}
+					{{ person.getHName() }}
+				</div>
+				{{ person.getInfo() }}
+			</div>
+			{% endfor %} {% endfor %}
+		</div>
+	</div>
+</div>
+<br>
