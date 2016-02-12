@@ -18,7 +18,8 @@
     <span class="hidden-sm hidden-xs"></br></span>
     <div class="row">
       <div class="col-xs-12">
-        {% if multimediaObject.property('geant_errors').date %}
+        {% set has_date_error = multimediaObject.property('geant_errors') ? (multimediaObject.property('geant_errors').date ? true : false) : false%}
+        {% if has_date_error %}
           <div class="alert alert-warning">
             <span class="glyphicon glyphicon-warning-sign" style="color:orange"></span>
             {{"This object's date could not be correctly added." }}
