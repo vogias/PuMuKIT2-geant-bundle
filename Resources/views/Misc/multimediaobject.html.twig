@@ -53,7 +53,7 @@ $(document).ready(function()
                     <div class="date mmobj" 
                          title="{{has_date_error?"This object's date could not be correctly added.":'' }}"
                          >
-                        {{object.recordDate|date("d/m/Y")}}
+                      {% trans %}Recorded:{% endtrans %} {{object.recordDate|date("d/m/Y")}}
                       {% if has_date_error %}
                         <span class="glyphicon glyphicon-warning-sign" style="color:orange"></span>
                       {% endif %}
