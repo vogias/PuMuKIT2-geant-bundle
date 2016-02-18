@@ -2,7 +2,7 @@
 <div class="search-box">
   <form class="input-group stylish-input-group" method="get" action="{{ path('pumukit_webtv_search_multimediaobjects') }}">
     <label for="search-box" class="sr-only">Search</label>
-    <input type="text" class="form-control" placeholder="{% trans %} Search {% endtrans %}..." name="search" id="search-box">
+    <input type="text" class="form-control" placeholder="{% trans %} Search OERs {% endtrans %}..." name="search" id="search-box">
     <span class="input-group-addon">
       <label for="submit-button" class="sr-only">Submit</label>
       <button type="submit" id="submit-button" style="border:0;background:transparent;">
@@ -10,9 +10,9 @@
       </button>
     </span>
   </form>
-</div>
-<!-- Search -->
-<div class="col-xs-12" align="right">
-  <a href="{{ path('pumukit_webtv_search_multimediaobjects')}}">{% trans %} Advanced Search {% endtrans %}</a>
+  <!-- Search -->
+  <div align="right" class="advanced-search">
+    <a href="{{ path('pumukit_webtv_search_multimediaobjects')}}">{% trans %} Advanced Search {% endtrans %}</a>
+  </div>
 </div>
 
