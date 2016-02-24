@@ -2,8 +2,8 @@
 
 {% block body %}
 
-
-
+{% set default_contrast_font = default_contrast_font | default("#fff") %}
+{% set default_light_background = default_light_background | default("#fff") %}
 {% set default_contrast_background = default_contrast_background | default("#033951") %} 
 {% set content_max_width = "1350px" %}
 {% set default_content_font = "#003c5e" %}
@@ -235,7 +235,14 @@ abbr[title]  {
     background-image: none;
     font-size: 3.8em;
 }
+.breadcrumb li:first-child {
+  padding-bottom: 0px;
+}
 
+.widget.slidebar {
+    padding-top: 30px;
+    padding-right: 15px;
+}
 .widget.slidebar a{
     font-weight: normal;
     font-size: 1em;
