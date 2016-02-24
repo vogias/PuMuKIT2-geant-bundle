@@ -6,7 +6,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class PumukitGeantWebTVBundle extends Bundle
 {
-  const VERSION = '1.0.1-dev';
+  const VERSION = '1.1.0-dev';
   public function getParent()
   {
     return 'PumukitWebTVBundle';
