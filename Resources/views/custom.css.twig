@@ -193,6 +193,14 @@ abbr[title]  {
 .mmobj_thumbnail_title:hover {
     border-bottom: 1px dotted grey;
 }
+.pumukit_mmobj{
+    overflow: hidden;
+    border-radius: 0;
+    height: 120px;
+}
+.pumukit_mmobj .info {
+    width: 100%;
+}
 .pumukit_mmobj:hover .info .title {
     color: grey;
     text-decoration-style: dotted;
@@ -279,9 +287,7 @@ abbr[title]  {
     margin-top: 10px;
     padding-right: 30px;
 }
-.pumukit_mmobj {
-    border-radius: 0;
-}
+
 {# #}
 select.form-control {
     background: {{default_contrast_background}};
@@ -405,12 +411,6 @@ select.form-control {
 {# #}
 .info-wrapper {
     overflow: hidden;
-}
-.pumukit_mmobj{
-    overflow: hidden;
-}
-.pumukit_mmobj .info {
-    width: 100%;
 }
 .cover {
     position: absolute;
