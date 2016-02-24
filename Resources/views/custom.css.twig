@@ -174,7 +174,10 @@ abbr[title]  {
 .date.mmobj {
     left: 157px;
 }
-
+.info .title {
+    height: 2.5em;
+    overflow: visible;
+}
 .info .title, .info .title a {
     color: {{default_light_font}};
     cursor: pointer;
@@ -200,6 +203,10 @@ abbr[title]  {
 }
 .pumukit_mmobj .info {
     width: 100%;
+}
+.pumukit_mmobj .info .subtitle{
+    width: 100%;
+    font-size: 1.2em;
 }
 .pumukit_mmobj:hover .info .title {
     color: grey;
@@ -453,4 +460,66 @@ a:hover .cover {
     background:rgba(0,0,0,0.65);
     padding: 1px 3px;
 }
+
+{# ==== MAGIC CSS TO ELLIPSE TEXT ==== #}
+.ellipsedtext-parent {
+    overflow: hidden;
+    width: 100%;
+    height: 120%;
+}
+.ellipsedtext-leftmargin {
+    float: left;
+    width: 2%;
+    height: 100%;
+}
+.ellipsedtext-testwrapper {
+    float: right;
+    width: 98%;
+}
+.ellipsedtext-text {
+    width: 800%;
+}
+.ellipsedtext-textstopper {
+    width: 87.5%;
+    height: 1em;
+    float: right;
+}
+.ellipsedtext-endtext {
+    display:inline-block;
+    width: 87.5%;
+    height: 1em;
+}
+.ellipsedtext-overflowdetector {
+    float: right;
+    width: 2%;
+    height: 20%;
+    position:relative;
+}
+.ellipsedtext-ellipse {
+    position: absolute;
+    top: -1.5em;
+    left: 4520%;
+    z-index: 2;
+    padding: 0 25px 0 15px;
+    background: rgba(255,255,255,0);
+    background: -moz-linear-gradient(left, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 32%, rgba(255,255,255,1) 100%);
+    background: -webkit-gradient(left top, right top, color-stop(0%, rgba(255,255,255,0)), color-stop(32%, rgba(255,255,255,1)), color-stop(100%, rgba(255,255,255,1)));
+    background: -webkit-linear-gradient(left, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 32%, rgba(255,255,255,1) 100%);
+    background: -o-linear-gradient(left, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 32%, rgba(255,255,255,1) 100%);
+    background: -ms-linear-gradient(left, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 32%, rgba(255,255,255,1) 100%);
+    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 32%, rgba(255,255,255,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ffffff', GradientType=1 );
+}
+
+.pumukit_mmobj:hover .ellipsedtext-ellipse {
+    background: rgba(255,255,255,0);
+    background: -moz-linear-gradient(left, rgba(255,255,255,0) 0%, {{ mmobj_selected_background }} 40%, {{ mmobj_selected_background }} 100%);
+    background: -webkit-gradient(left top, right top, color-stop(0%, rgba(255,255,255,0)), color-stop(40%, {{ mmobj_selected_background }}), color-stop(100%, {{ mmobj_selected_background }}));
+    background: -webkit-linear-gradient(left, rgba(255,255,255,0) 0%, {{ mmobj_selected_background }} 40%, {{ mmobj_selected_background }} 100%);
+    background: -o-linear-gradient(left, rgba(255,255,255,0) 0%, {{ mmobj_selected_background }} 40%, {{ mmobj_selected_background }} 100%);
+    background: -ms-linear-gradient(left, rgba(255,255,255,0) 0%, {{ mmobj_selected_background }} 40%, {{ mmobj_selected_background }} 100%);
+    background: linear-gradient(to right, rgba(255,255,255,0) 0%, {{ mmobj_selected_background }} 40%, {{ mmobj_selected_background }} 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='{{ mmobj_selected_background }}', endColorstr='{{ mmobj_selected_background }}', GradientType=1 );
+}
+{# ==== END MAGIC CSS TO ELLIPSE TEXT ==== #}
 {% endblock %}
