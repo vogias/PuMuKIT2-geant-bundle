@@ -61,10 +61,19 @@ class FeedSyncService
         $this->tagRepo = $this->dm->getRepository('PumukitSchemaBundle:Tag');
         $this->personRepo = $this->dm->getRepository('PumukitSchemaBundle:Person');
         $this->roleRepo = $this->dm->getRepository('PumukitSchemaBundle:Role');
+
+        if (!$this->webTVTag = $this->tagRepo->findOneByCod('PUCHWEBTV')) {
+            throw new FeedSyncException('Tag: PUCHWEBTV does not exists. Did you initialize the repository? (pumukit:init:repo all --force)');
+        }
+        if (!$baseRootTag = $this->tagRepo->findOneByCod('ROOT')) {
+            throw new FeedSyncException('Tag: ROOT does not exists. Did you initialize the repository? (pumukit:init:repo all --force)');
+        }
+
         $this->providerRootTag = $this->tagRepo->findOneByCod('PROVIDER');
+
         if (!isset($this->providerRootTag)) {
             $newTag = new Tag();
-            $newTag->setParent($this->tagRepo->findOneByCod('ROOT'));
+            $newTag->setParent($baseRootTag);
             $newTag->setCod('PROVIDER');
             $newTag->setMetatag(true);
             $newTag->setDisplay(false);
@@ -72,10 +81,6 @@ class FeedSyncService
             $this->dm->persist($newTag);
             $this->dm->flush();
             $this->providerRootTag = $newTag;
-        }
-        $this->webTVTag = $this->tagRepo->findOneByCod('PUCHWEBTV');
-        if (!isset($this->webTVTag)) {
-            throw new FeedSyncException('Tag: PUCHWEBTV does not exists. Did you initialize the repository? (pumukit:init:repo)');
         }
         $this->optWall = false;
     }
@@ -98,6 +103,7 @@ class FeedSyncService
         $this->dm->clear();
         $output->writeln(sprintf('Number of blocked mmobjs: %s', $count));
         $output->writeln('...Blocking empty tags...');
+        $this->providerRootTag = $this->tagRepo->findOneByCod('PROVIDER');
         $providerTags = $this->providerRootTag->getChildren();
         $count = 0;
         foreach ($providerTags as $tag) {
@@ -249,12 +255,12 @@ class FeedSyncService
         //We assume the 'provider' property of a feed won't change for the same Geant Feed Resource.
         //If it changes, the mmobj would keep it's original provider.
         if (!isset($mmobj)) {
-            $mmobj = $factory->createMultimediaObject($series, false);
-            $mmobj->setProperty('geant_id', $parsedTerena['identifier']);
-            $mmobj->setProperty('feed_updated_date', $parsedTerena['lastUpdateDate']);
             //Add 'provider' tag
             $providerTag = $this->tagRepo->findOneByCod($parsedTerena['provider']);
+            $this->providerRootTag = $this->tagRepo->findOneByCod('PROVIDER');
+
             if (!isset($providerTag)) {
+                echo "\nCREATING:".$parsedTerena['provider']."\n";
                 $providerTag = new Tag();
                 $providerTag->setParent($this->providerRootTag);
                 $providerTag->setCod($parsedTerena['provider']);
@@ -262,7 +268,12 @@ class FeedSyncService
                 $providerTag->setDisplay(true);
                 $providerTag->setMetatag(false);
                 $this->dm->persist($providerTag);
+                $this->dm->flush();
             }
+
+            $mmobj = $factory->createMultimediaObject($series, false);
+            $mmobj->setProperty('geant_id', $parsedTerena['identifier']);
+            $mmobj->setProperty('feed_updated_date', $parsedTerena['lastUpdateDate']);
             $this->tagService->addTagToMultimediaObject($mmobj, $providerTag->getId(), false);
         }
 
@@ -291,8 +302,7 @@ class FeedSyncService
         //Errors
         if ($parsedTerena['geantErrors']) {
             $mmobj->setProperty('geant_errors', $parsedTerena['geantErrors']);
-        }
-        else {
+        } else {
             $mmobj->setProperty('geant_errors', null);
         }
 
