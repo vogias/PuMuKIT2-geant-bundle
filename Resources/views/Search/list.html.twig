@@ -1,39 +1,40 @@
 <div>
-  {% set lastDate = '--' %}
-  {% set lastSubserialTitle = 0 %}
-  <br>
-  <div class="col-xs-12">
-    {% if type == 'series' %}
-      {% include 'PumukitWebTVBundle:Search:filtersseries.html.twig' %}
-    {% else %}
-      {% include 'PumukitWebTVBundle:Search:filtersmultimediaobjects.html.twig' %}
-    {% endif %}
-  </div>
-  <div style="clear:both">{# PREVENTS MMOBJS FROM EXTENDING TO TOP #}</div>
-  <div id="search_results">
-    <p style="padding-left:15px;color:black;font-weight:bold;font-size:1.2em;">{% trans %}Total search results:{% endtrans %} {{total_objects}}</p>
-    {% for object in objects %}
-      {% if object.isCollection() %}
-        {% include 'PumukitWebTVBundle:Misc:series.html.twig' with{ 'cols': number_cols } %}
-        {% set lastDate = object.getRecordDate()|date("Y") %}
-      {% else %}
-        {% if object.getRecordDate()|date("Y") != lastDate %}
-          <div style="clear:both;"></div>
-          <br />
-          <h2 class="search_group_date">
-            {{ object.getRecordDate()|date("Y") }}
-          </h2>
-        {% endif %}
-        {% include 'PumukitWebTVBundle:Misc:multimediaobject.html.twig' with{ 'cols': number_cols } %}
-        {% set lastDate = object.getRecordDate()|date("Y") %}
-      {% endif %}
-    {% else %}
-      <div class="main_menu_text text-center">
-        {% trans %}No resources found{% endtrans %}
-      </div>
-    {% endfor %}
-  </div>
-  <div id="search_spinner" style="display:none;text-align:center;">
-    <img src="{{ asset('bundles/pumukitgeantwebtv/images/spinner.gif') }}"/>
-  </div>
+	{% set lastDate = '--' %} {% set lastSubserialTitle = 0 %} <br>
+	<div class="col-xs-12">{% if type == 'series' %} {% include
+		'PumukitWebTVBundle:Search:filtersseries.html.twig' %} {% else %} {%
+		include 'PumukitWebTVBundle:Search:filtersmultimediaobjects.html.twig'
+		%} {% endif %}</div>
+	<div style="clear: both">{# PREVENTS MMOBJS FROM EXTENDING TO TOP #}</div>
+	<div id="search_results">
+		<p
+			style="padding-left: 15px; color: black; font-weight: bold; font-size: 1.2em;">{%
+			trans %}Total search results:{% endtrans %} {{total_objects}}</p>
+		{% for object in objects %} {% if object.isCollection() %} {% include
+		'PumukitWebTVBundle:Misc:series.html.twig' with{ 'cols': number_cols }
+		%} {% set lastDate = object.getRecordDate()|date("Y") %} {% else %} {%
+		if object.getRecordDate()|date("Y") != lastDate %}
+		<div style="clear: both;"></div>
+		<br /> {% set year = object.getRecordDate()|date("Y")%}
+		
+		 {% if
+		year=="1970" %}
+		<h2 class="search_group_date"><span class="glyphicon glyphicon-warning-sign" style="color:orange"></span> N/A (This object's date could not be correctly added)</h2>
+		{% else %}
+		<h2 class="search_group_date">{{ year }}<h4>
+		{% endif %}
+		
+		
+		
+		
+		 {% endif %} {% include
+		'PumukitWebTVBundle:Misc:multimediaobject.html.twig' with{ 'cols':
+		number_cols } %} {% set lastDate = object.getRecordDate()|date("Y") %}
+		{% endif %} {% else %}
+		<div class="main_menu_text text-center">{% trans %}No resources
+			found{% endtrans %}</div>
+		{% endfor %}
+	</div>
+	<div id="search_spinner" style="display: none; text-align: center;">
+		<img src="{{ asset('bundles/pumukitgeantwebtv/images/spinner.gif') }}" />
+	</div>
 </div>
