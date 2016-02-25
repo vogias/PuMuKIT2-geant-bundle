@@ -197,6 +197,19 @@ abbr[title]  {
 .mmobj_thumbnail_title:hover {
     border-bottom: 1px dotted grey;
 }
+.pumukit_mmobj{
+    overflow: hidden;
+    border-radius: 10px;
+    height: 120px;
+    border: 2px solid {{default_content_font}};
+}
+.pumukit_mmobj .info {
+    width: 100%;
+}
+.pumukit_mmobj .info .subtitle{
+    width: 100%;
+    font-size: 1.2em;
+}
 .pumukit_mmobj:hover .info .title {
     color: grey;
     text-decoration-style: dotted;
@@ -273,9 +286,6 @@ abbr[title]  {
 .menu.navbar {
     margin-top: 10px;
     padding-right: 30px;
-}
-.pumukit_mmobj {
-    border: 2px solid {{default_content_font}};
 }
 {# #}
 select.form-control {
