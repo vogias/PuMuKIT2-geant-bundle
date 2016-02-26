@@ -19,7 +19,7 @@ class AnnouncesController extends Controller
     public function latestUploadsAction(Request $request)
     {
         $limit = 20;
-        $templateTitle = 'Latest Uploads';
+        $templateTitle = 'Recently added';
         if($this->container->hasParameter('menu.announces_title')) {
             $templateTitle = $this->container->getParameter('menu.announces_title');
         }
