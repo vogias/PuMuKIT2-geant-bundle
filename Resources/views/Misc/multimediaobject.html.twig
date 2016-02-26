@@ -1,70 +1,70 @@
 <script>
-$(document).ready(function()
-{
-    $(".thumbnailimg").error(function(){
-        $(this).attr('src', '{{asset('bundles/pumukitgeantwebtv/images/no_image.jpg')}}');
-    });
-});
+ $(document).ready(function()
+     {
+         $(".thumbnailimg").error(function(){
+             $(this).attr('src', '{{asset('bundles/pumukitgeantwebtv/images/no_image.jpg')}}');
+         });
+     });
 </script>
 <!--Objeto multimedia-->
 {% set col_mapper = {'1': 'col-md-12', '2': 'col-md-6', '3': 'col-md-4', '4': 'col-md-3'} %}
 {% set col_class = ( col_mapper[cols|default('1')] | default(col_mapper['1'] ) ) %}
 
 {# Checking if there is an error on this object and if this error is a date one #}
-{% set has_date_error = object.property('geant_errors') ? (object.property('geant_errors').date ? true : false) : false%}
+{% set has_date_error = object.property('geant_errors') ? (object.property('geant_errors').date ? true : false) : false %}
 
 <div class="{{ col_class }}">
-
-    <a href="{{ path('pumukit_webtv_multimediaobject_index', {'id': object.id}) }}" target="{{object.getProperty('redirect')?"_blank":"_self"}}">
-        <div class="pumukit_mmobj">
-            <div class="thumbnail">
-              {% if object.durationString == "0''" %}
-                <span class="play_icon" alt="" ></span>
-              {% else %}
-                <span class="video-duration">{{ object.durationString }}</span>
-              {% endif %}
-                <img alt="serial_pic" class="serial thumbnailimg" src="{{ object|first_url_pic(true) }}"/>
-                <div class="thumbnailholder" ></div>
-            </div>
-            <div class="info-wrapper">
-                <div class="info">
-                    <div class="title" title="{{object.description}}">
-                        <div class="ellipsedtext-parent">
-                            <div class="ellipsedtext-leftmargin"></div>
-                            <div class="ellipsedtext-testwrapper">
-                                <div class="ellipsedtext-text">
-                                    <div class="ellipsedtext-textstopper"></div>
-                                    <span class="mmobj_thumbnail_title">{{object.title | default('No title')|trans}}</span>
-                                    <div class="ellipsedtext-endtext"></div>
-                                </div>
-                            </div>
-                            <div class="ellipsedtext-overflowdetector">
-                                <div class="ellipsedtext-ellipse">...</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="subtitle">
-                        {% if object.subtitle is not empty %}
-                        <div style="overflow:hidden;height:1.2em;text-overflow:ellipsis; width:100%;white-space: nowrap;" title="{{object.subtitle}}">{{object.subtitle}}</div>
-                        {% else %}
-                        <div style="overflow:hidden;height:1.2em;text-overflow:ellipsis; width:100%;white-space: nowrap;" title="{{object.series.title}}">{{object.series.title}}</div>
-                        {% endif %}
-                    </div>
-                    <div class="date mmobj" 
-                         title="{{has_date_error?"This object's date could not be correctly added.":'' }}"
-                         >
-                        {{object.recordDate|date("d/m/Y")}}
-                      {% if has_date_error %}
-                        <span class="glyphicon glyphicon-warning-sign" style="color:orange"></span>
-                      {% endif %}
-                    </div>
-                    <div class=" mmobj-numviewed">{% set num_viewed = object.numview %}
-                        {% transchoice num_viewed %}
-                        {1} Viewed %num_viewed% time. |[0, Inf]Viewed %num_viewed% times
-                        {% endtranschoice %}
-                    </div>
+  <a href="{{ path('pumukit_webtv_multimediaobject_index', {'id': object.id}) }}" target="{{object.getProperty('redirect')?"_blank":"_self"}}">
+    <div class="pumukit_mmobj">
+      <div class="thumbnail">
+        {% if object.durationString == "0''" %}
+          <span class="play_icon" alt="" ></span>
+        {% else %}
+          <span class="video-duration">{{ object.durationString }}</span>
+        {% endif %}
+        <img alt="serial_pic" class="serial thumbnailimg" src="{{ object|first_url_pic(true) }}"/>
+        <div class="thumbnailholder" ></div>
+      </div>
+      <div class="info-wrapper">
+        <div class="info">
+          <div class="title" title="{{object.description}}">
+            <div class="ellipsedtext-parent">
+              <div class="ellipsedtext-leftmargin"></div>
+              <div class="ellipsedtext-testwrapper">
+                <div class="ellipsedtext-text">
+                  <div class="ellipsedtext-textstopper"></div>
+                  <span class="mmobj_thumbnail_title">{{object.title | default('No title')|trans}}</span>
+                  <div class="ellipsedtext-endtext"></div>
                 </div>
+              </div>
+              <div class="ellipsedtext-overflowdetector">
+                <div class="ellipsedtext-ellipse">...</div>
+              </div>
             </div>
+          </div>
+          <div class="subtitle">
+            {% if object.subtitle is not empty %}
+              <div style="overflow:hidden;height:1.2em;text-overflow:ellipsis; width:100%;white-space: nowrap;" title="{{object.subtitle}}">{{object.subtitle}}</div>
+            {% else %}
+              <div style="overflow:hidden;height:1.2em;text-overflow:ellipsis; width:100%;white-space: nowrap;" title="{{object.series.title}}">{{object.series.title}}</div>
+            {% endif %}
+          </div>
+          <div class="date mmobj" 
+               title="{{has_date_error?"This object's date could not be correctly added.":'' }}"
+               >
+            {{object.recordDate|date("d/m/Y")}}
+            {% if has_date_error %}
+              <span class="glyphicon glyphicon-warning-sign" style="color:orange"></span>
+            {% endif %}
+          </div>
+          <div class=" mmobj-numviewed">
+            {% set num_viewed = object.numview %}
+            {% transchoice num_viewed %}
+              {1} Viewed %num_viewed% time. |[0, Inf]Viewed %num_viewed% times
+            {% endtranschoice %}
+          </div>
         </div>
-    </a>
+      </div>
+    </div>
+  </a>
 </div>
