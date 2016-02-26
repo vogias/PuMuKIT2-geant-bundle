@@ -19,19 +19,13 @@ class AnnouncesController extends Controller
     public function latestUploadsAction(Request $request)
     {
         $limit = 20;
-        $templateTitle = 'Recently added';
-        if($this->container->hasParameter('menu.announces_title')) {
-            $templateTitle = $this->container->getParameter('menu.announces_title');
-        }
+        $templateTitle = $this->container->getParameter('menu.announces_title');
+        $numberCols = $this->container->getParameter('columns_objs_announces');
+
         $this->get('pumukit_web_tv.breadcrumbs')->addList($templateTitle, 'pumukit_webtv_announces_latestuploads');
 
         $announcesService = $this->get('pumukitschema.announce');
-
-        $lastMms = array();
-        $mmobjRepo = $this->getDoctrine()->getRepository('PumukitSchemaBundle:MultimediaObject');
-        //Get last objects without errors.
-        $lastMms = $mmobjRepo->findStandardBy(array(), array('public_date' => -1), $limit, 0);
-        $numberCols = $this->container->getParameter('columns_objs_announces');
+        $lastMms = $announcesService->getLast($limit);
 
         return array('template_title' => $templateTitle,
                      'last' => $lastMms,

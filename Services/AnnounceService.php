@@ -17,41 +17,9 @@ class AnnounceService
 
     public function getLast($limit = 3)
     {
-        $mmobjColl = $this->dm->getDocumentCollection('PumukitSchemaBundle:MultimediaObject');
-        $filters = $this->dm->getFilterCollection()
-            ->getFilterCriteria($this->mmobjRepo->getClassMetadata());
-
-        $pipeline = array(
-            array('$match' => $filters),
-            array('$sort' => array('public_date' => 1)),
-            array('$group' => array('_id' => '$series', 'id' => array('$first' => '$_id'))),
-            array('$limit' => $limit),
-        );
-        $aggregation = $mmobjColl->aggregate($pipeline);
-
-        $ids = array();
-        foreach ($aggregation as $element) {
-            $ids[] = $element['id'];
-        }
-
-        $queryBuilderMms = $this->mmobjRepo->createStandardQueryBuilder()
-            ->addAnd(array('_id' => array('$in' => $ids)))
-            ->sort(array('public_date' => -1))
-            ->limit($limit);
-        $last = $queryBuilderMms->getQuery()->execute()->toArray();
-
-        if ($limit != count($last)) {
-            return array_merge(
-                $last,
-                $this->mmobjRepo->findStandardBy(
-                    $criteria = array('_id' => array('$nin' => $ids)),
-                    array('public_date' => -1),
-                    $limit - count($last)
-                )
-            );
-        }
-
-        return $last;
+        //Get last objects without errors.
+        $lastMms = $this->mmobjRepo->findStandardBy(array(), array('public_date' => -1), $limit, 0);
+        return $lastMms;
     }
 
     public function getLatestUploadsByDates($dateStart, $dateEnd)
