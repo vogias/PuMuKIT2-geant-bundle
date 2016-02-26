@@ -14,25 +14,44 @@
 		%} {% set lastDate = object.getRecordDate()|date("Y") %} {% else %} {%
 		if object.getRecordDate()|date("Y") != lastDate %}
 		<div style="clear: both;"></div>
-		<br /> {% set year = object.getRecordDate()|date("Y")%}
+		<br />
 		
-		 {% if
-		year=="1970" %}
-		<h2 class="search_group_date"><span class="glyphicon glyphicon-warning-sign" style="color:orange"></span> N/A (This object's date could not be correctly added)</h2>
+		
+		
+		
+		 {% set year = object.getRecordDate()|date("Y")%}
+		 
+		  {% if year=="1970" %}
+		<div 
+					title="This repository's date could not be correctly determined.">
+					<h2 class="search_group_date">
+						 N/A
+					</h2>
+
+
+				</div>
 		{% else %}
-		<h2 class="search_group_date">{{ year }}<h4>
-		{% endif %}
-		
-		
-		
-		
-		 {% endif %} {% include
-		'PumukitWebTVBundle:Misc:multimediaobject.html.twig' with{ 'cols':
-		number_cols } %} {% set lastDate = object.getRecordDate()|date("Y") %}
-		{% endif %} {% else %}
-		<div class="main_menu_text text-center">{% trans %}No resources
-			found{% endtrans %}</div>
-		{% endfor %}
+		<h2 class="search_group_date">
+			{{ year }}
+			<h4>
+				{% endif %}
+
+
+
+				
+
+
+
+
+
+				{% endif %} {% include
+				'PumukitWebTVBundle:Misc:multimediaobject.html.twig' with{ 'cols':
+				number_cols } %} {% set lastDate = object.getRecordDate()|date("Y")
+				%} {% endif %} {% else %}
+				<div class="main_menu_text text-center">{% trans %}No resources
+					found{% endtrans %}</div>
+				{% endfor %}
+	
 	</div>
 	<div id="search_spinner" style="display: none; text-align: center;">
 		<img src="{{ asset('bundles/pumukitgeantwebtv/images/spinner.gif') }}" />
