@@ -62,6 +62,7 @@ class ChannelsController extends Controller
         $queryBuilder = $this->dateQueryBuilder($queryBuilder, $startFound, $endFound, $yearFound);
         $queryBuilder = $this->languageQueryBuilder($queryBuilder, $languageFound);
         $queryBuilder = $this->tagsQueryBuilder($queryBuilder, $tagsFound);
+        $queryBuilder = $queryBuilder->sort('record_date','desc');
         // --- END Create QueryBuilder ---
         // --- Execute QueryBuilder count --
         $countQuery = clone $queryBuilder;
